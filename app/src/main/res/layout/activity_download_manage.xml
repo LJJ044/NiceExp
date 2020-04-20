@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DownloadManageActivity"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp">
+    <ImageView
+        android:id="@+id/goBack_download"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/backspace"
+        android:layout_gravity="center_vertical"
+       style="@style/button_state_bg"/>
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/download"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp" />
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+<android.support.v7.widget.RecyclerView
+    android:id="@+id/rv_fileName"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:background="@color/drawer_background">
+
+</android.support.v7.widget.RecyclerView>
+    <TextView
+        android:id="@+id/state_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="当前没有下载内容"
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+    </FrameLayout>
+</LinearLayout>

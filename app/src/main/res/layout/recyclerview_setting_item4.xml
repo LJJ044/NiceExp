@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="15dp">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/tv_noTrack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开启无痕浏览"
+        android:textSize="20sp"/>
+    <Switch
+        android:id="@+id/sw_noTrack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:thumb="@drawable/switch_thumb"
+        android:track="@drawable/switch_track"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/login_hint_color"
+        android:layout_below="@id/tv_noTrack"
+        android:layout_marginTop="10dp"/>
+</RelativeLayout>
+</LinearLayout>

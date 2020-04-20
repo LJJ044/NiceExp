@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragment2">
+
+    <RelativeLayout
+        android:id="@+id/out_area"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <RelativeLayout
+        android:id="@+id/url_bar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/shape">
+        <RelativeLayout
+            android:id="@+id/et_area"
+            android:layout_width="325dp"
+            android:layout_height="40dp"
+            android:layout_toRightOf="@id/pbar">
+            <ImageView
+                android:id="@+id/url_main_title"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/et_url"
+                android:layout_width="325dp"
+                android:layout_height="40dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/url_main_title"
+                android:backgroundTint="@color/transparent"
+                android:ems="30"
+                android:singleLine="true"
+                android:textColor="#6c6161"
+                android:textSize="15dp" />
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/pbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true" />
+
+    </RelativeLayout>
+   <com.example.excelergo.niceexp.MyWebView
+       android:id="@+id/wv_music"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:layout_above="@id/bottombar"
+       android:layout_below="@id/url_bar"/>
+
+      <LinearLayout
+          android:id="@+id/bottombar"
+          android:layout_width="match_parent"
+          android:layout_height="40dp"
+          android:orientation="horizontal"
+          android:layout_alignParentBottom="true"
+          android:background="#f9f7f7">
+            <RelativeLayout
+                android:id="@+id/bottom_bar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+            <ImageView
+                android:id="@+id/iv_option_right"
+                style="@style/option_button"
+                android:background="@drawable/main_page"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@id/iv_option_center"
+                android:layout_marginRight="10dp"/>
+            <ImageView
+                android:id="@+id/iv_option_center"
+                style="@style/option_button"
+                android:background="@drawable/options"
+                android:layout_centerInParent="true" />
+            <ImageView
+                android:id="@+id/iv_option_left"
+                style="@style/option_button"
+                android:layout_alignParentLeft="true"
+                android:layout_alignTop="@id/iv_option_center"
+                android:src="@drawable/backspace4"
+                android:layout_marginLeft="10dp"/>
+                <ImageView
+                    android:id="@+id/iv_option_left2"
+                    style="@style/option_button"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@id/iv_option_center"
+                    android:layout_marginLeft="100dp"
+                    android:src="@drawable/backspace3"/>
+
+            </RelativeLayout>
+
+      </LinearLayout>
+
+   </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/control_webview"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_gravity="bottom"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="75dp"
+        android:layout_marginRight="-20dp"
+        android:src="@drawable/arrow"
+        android:layout_marginLeft="310dp"/>
+    <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom">
+        <include
+            android:layout_width="200dp"
+            android:layout_height="60dp"
+            android:id="@+id/url_hint"
+            layout="@layout/url_hint"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="60dp"
+           />
+</RelativeLayout>
+</FrameLayout>

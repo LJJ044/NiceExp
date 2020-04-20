@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008509</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#4084ff</color>
+    <color name="transparent">#00000000</color>
+    <color name="tvSelected">#d9d5d5</color>
+    <color name="white">#d2f9f7f7</color>
+    <color name="et_url_color">#edecec</color>
+    <color name="state_bar_color">#f2dc32</color>
+    <color name="drawer_background">#fff</color>
+    <color name="popupmenu">#fff</color>
+    <color name="text_history_color">#4d4949</color>
+    <color name="hint_background">#c6edecec</color>
+    <color name="user_text_color">#000</color>
+    <color name="login_hint_color">#d2cfcf</color>
+    <color name="pure_black">#000</color>
+    <color name="chooseimg_bg">#c2ffffff</color>
+</resources>

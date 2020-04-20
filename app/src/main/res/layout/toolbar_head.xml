@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:orientation="vertical"
+    android:id="@+id/rl_history"
+    android:background="@color/state_bar_color">
+    <LinearLayout
+        android:id="@+id/toptop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#00000000"
+        android:orientation="horizontal" />
+
+    <TextView
+        android:id="@+id/toolbar_img_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toptop"
+        android:gravity="center"
+        android:text="历史记录/收藏"
+        android:textColor="@color/white"
+        android:textSize="@dimen/ToolBarMainTextSize"
+        android:layout_marginTop="40dp"/>
+
+        <ImageView
+            android:id="@+id/history_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_delete"
+            android:layout_alignTop="@+id/toolbar_img_title"
+            android:layout_alignBottom="@+id/toolbar_img_title"
+            android:layout_alignParentRight="true" />
+
+</RelativeLayout>
+

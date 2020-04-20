@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="200dp"
+    android:layout_height="200dp"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:background="@color/chooseimg_bg">
+<TextView
+    android:id="@+id/open_gallery"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="选取相册"
+    android:textSize="25sp"
+    android:padding="20dp"/>
+    <TextView
+        android:id="@+id/open_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="打开相机"
+        android:textSize="25sp"
+        android:padding="20dp"/>
+</LinearLayout>

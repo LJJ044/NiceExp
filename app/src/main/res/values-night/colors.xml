@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimaryDark">#fff</color>
+    <color name="drawer_background">#4e4b4b</color>
+    <color name="popupmenu">#4e4b4b</color>
+    <color name="text_history_color">#fff</color>
+    <color name="hint_background">#b46e6a6a</color>
+    <color name="chooseimg_bg">#c2969191</color>
+</resources>
