@@ -36,6 +36,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import utils.OnJsonStringCallBack;
+
 import static android.app.Activity.RESULT_OK;
 import static com.example.excelergo.niceexp.MainActivity.tv_temp;
 import static com.example.excelergo.niceexp.MainActivity.tv_weather;
@@ -53,7 +56,6 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
     static String city2;
     String temp, weather,jsonString;
     private String headFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/myinfo/userInfo/";
-
     public Fragment4() {
 
     }
@@ -284,34 +286,25 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
     }
 
     public void loadWeatherData() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
                 String head1 = "http://apis.juhe.cn/simpleWeather/query?city=";
                 String head3 = "&key=460f4b8be1eeda3f990cde2604ad5279";
-                Request request = new Request.Builder().url(head1 + city2 + head3).build();
-                Call call = okHttpClient.newCall(request);
-                try {
-                    Response response = call.execute();
-                    jsonString= response.body().string();
-                    handleData(jsonString);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                getActivity().runOnUiThread(new Runnable() {
+                String weatherStr=head1 + city2 + head3;
+                MyOkHttpClientUtil.sendRequestForResult(weatherStr, new OnJsonStringCallBack() {
                     @Override
-                    public void run() {
-                        if(tv_weather!=null&&temp!=null) {
-                            tv_weather.setText(weather);
-                            tv_temp.setText(temp + "℃");
-                            handler.sendEmptyMessage(1);
-                        }
+                    public void goWithNewsString(String content) {
+                        try {
+                            handleData(content);
 
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
-            }
-        }).start();
+        if(tv_weather!=null&&temp!=null) {
+            tv_weather.setText(weather);
+            tv_temp.setText(temp + "℃");
+            handler.sendEmptyMessage(1);
+        }
 
     }
     private void handleData(String jsonString){

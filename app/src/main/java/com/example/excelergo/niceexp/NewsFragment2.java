@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import utils.OnJsonStringCallBack;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,7 +32,6 @@ import java.util.List;
 public class NewsFragment2 extends Fragment {
     private RecyclerView recyclerView;
     private MyAdapter myAdapter;
-    private OkHttpClient okHttpClient;
     private List<NewsBean> newsBeanList;
     public NewsFragment2() {
 
@@ -41,56 +42,42 @@ public class NewsFragment2 extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_news_fragment2, container, false);
         recyclerView = view.findViewById(R.id.rv_2);
-        okHttpClient = new OkHttpClient();
         newsBeanList = new ArrayList<>();
-        //init();
+        init();
+        myAdapter=new MyAdapter();
+        recyclerView.setAdapter(myAdapter);
+        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
         return view;
     }
+    //请求网络获取Json数据
     private void init(){
-        new Thread(new Runnable() {
+        String url1 = "http://v.juhe.cn/toutiao/index?type=";
+        String url2 = "&key=33b5bc8bfd2c5a6775a74c0f35471c33";
+        String url3 = "shehui";
+        String f2News = url1 + url3 + url2;
+        MyOkHttpClientUtil.sendRequestForResult(f2News, new OnJsonStringCallBack() {
             @Override
-            public void run() {
-                String url1="http://v.juhe.cn/toutiao/index?type=";
-                String url2="&key=33b5bc8bfd2c5a6775a74c0f35471c33";
-                String url3="shehui";
-                String s="";
+            public void goWithNewsString(String content) {
                 try {
-                    Request request=new Request.Builder().url(url1+url3+url2).build();
-                        Call call = okHttpClient.newCall(request);
-                        Response response = call.execute();
-                        s = response.body().string();
-                        try {
-                            JSONObject jsonObject = new JSONObject(s);
-                            JSONObject jsonObject2 = jsonObject.getJSONObject("result");
-                            JSONArray jsonArray = jsonObject2.getJSONArray("data");
-                            for (int i = 0; i <5; i++) {
-                                JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-                                String title = jsonObject1.getString("title");
-                                String picture = jsonObject1.getString("thumbnail_pic_s");
-                                String url = jsonObject1.getString("url");
-                                newsBeanList.add(new NewsBean(title, picture, url));
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                } catch (IOException e) {
+                    JSONObject jsonObject = new JSONObject(content);
+                    JSONObject jsonObjectResult = jsonObject.getJSONObject("result");
+                    JSONArray jsonArray = jsonObjectResult.getJSONArray("data");
+                    for (int i = 0; i < 2; i++) {
+                        JSONObject jsonObject1 = jsonArray.getJSONObject(i);
+                        String title = jsonObject1.getString("title");
+                        String picture = jsonObject1.getString("thumbnail_pic_s");
+                        String url = jsonObject1.getString("url");
+                        newsBeanList.add(new NewsBean(title, picture, url));
+                    }
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
-               getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                            myAdapter=new MyAdapter();
-                            recyclerView.setAdapter(myAdapter);
-                            LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
-                            linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                            recyclerView.setLayoutManager(linearLayoutManager);
-                    }
-                });
             }
+        });
 
-        }).start();
     }
 
     class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder>{
