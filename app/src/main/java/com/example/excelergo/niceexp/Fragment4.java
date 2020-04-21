@@ -52,9 +52,8 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
     private LinearLayout popup_choose;
     private Bitmap head;
     private PullToRefreshView mpullToRefreshView;
-    private OkHttpClient okHttpClient = new OkHttpClient();
     static String city2;
-    String temp, weather,jsonString;
+    String temp, weather;
     private String headFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/myinfo/userInfo/";
     public Fragment4() {
 
@@ -80,7 +79,7 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
                 }, 1000);
             }
         });
-        loadWeatherData();//加载天气数据
+        //loadWeatherData();//加载天气数据
         initListener();
         loadTouxiang();//加载头像
         readsign();//读取签名内容

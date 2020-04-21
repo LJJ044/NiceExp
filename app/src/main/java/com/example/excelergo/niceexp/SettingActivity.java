@@ -9,6 +9,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import utils.GoBackAction;
@@ -16,13 +17,13 @@ import utils.GoBackAction;
 public class SettingActivity extends AppCompatActivity {
 private RecyclerView rv_setting;
 public MySettingRecyclerAdapter adapter;
-private ImageView goBack;
+private RadioButton goBack;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         rv_setting=(RecyclerView) findViewById(R.id.rv_setting);
-        goBack=(ImageView)findViewById(R.id.img_goBack);
+        goBack=(RadioButton) findViewById(R.id.img_goBack);
         LinearLayoutManager manager=new LinearLayoutManager(SettingActivity.this);
         manager.setOrientation(LinearLayout.VERTICAL);
         rv_setting.setLayoutManager(manager);

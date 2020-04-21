@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -274,7 +275,13 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
                                dialog=new ProgressDialog(getContext());
                                dialog.setTitle("文件下载中");
                                dialog.setCancelable(false);
-                               dialog.setButton("取消", new DialogInterface.OnClickListener() {
+                               dialog.setButton("后台下载", new DialogInterface.OnClickListener() {
+                                   @Override
+                                   public void onClick(DialogInterface dialogInterface, int i) {
+                                       dialog.dismiss();
+                                   }
+                               });
+                               dialog.setButton2("取消", new DialogInterface.OnClickListener() {
                                    @Override
                                    public void onClick(DialogInterface dialogInterface, int i) {
                                        GetFileFromUrlUtil.getFileFromUrl(url, handler_page, new GoBackEndCallBack() {

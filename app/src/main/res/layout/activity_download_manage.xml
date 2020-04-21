@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,35 +7,44 @@
     tools:context=".DownloadManageActivity"
     android:orientation="vertical">
     <LinearLayout
+        android:id="@+id/top_manage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#1CFFFFFF"
+        android:orientation="horizontal"/>
+    <LinearLayout
+        android:id="@+id/title_bar_manage"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="20dp">
-    <ImageView
+        android:layout_marginTop="40dp"
+        android:layout_below="@id/top_manage"
+        android:gravity="center_vertical">
+    <RadioButton
         android:id="@+id/goBack_download"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@drawable/backspace"
-        android:layout_gravity="center_vertical"
-       style="@style/button_state_bg"/>
+        style="@style/goBack_rb"
+        android:drawableEnd="@drawable/goback"
+        android:layout_marginStart="20dp"
+        />
     <ImageView
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:src="@drawable/download"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp" />
+        android:layout_marginStart="20dp" />
     </LinearLayout>
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-<android.support.v7.widget.RecyclerView
-    android:id="@+id/rv_fileName"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="20dp"
-    android:background="@color/drawer_background">
+        android:layout_height="match_parent"
+        android:layout_below="@id/title_bar_manage">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_fileName"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/drawer_background"
+            android:padding="20dp">
 
-</android.support.v7.widget.RecyclerView>
-    <TextView
+        </android.support.v7.widget.RecyclerView>
+
+        <TextView
         android:id="@+id/state_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,4 +53,4 @@
         android:layout_gravity="center"
         android:visibility="gone"/>
     </FrameLayout>
-</LinearLayout>
+</RelativeLayout>

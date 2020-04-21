@@ -11,12 +11,17 @@
         android:layout_height="wrap_content"
         android:background="#00000000"
         android:orientation="horizontal" />
-
+    <RadioButton
+        android:id="@+id/rb_goBack"
+        style="@style/goBack_rb"
+        android:drawableEnd="@drawable/goback"
+        android:layout_alignTop="@+id/toolbar_img_title"
+        android:layout_alignBottom="@+id/toolbar_img_title"
+        android:layout_marginStart="20dp"/>
     <TextView
         android:id="@+id/toolbar_img_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toptop"
         android:gravity="center"
         android:text="历史记录/收藏"
         android:textColor="@color/white"
@@ -30,7 +35,7 @@
             android:src="@android:drawable/ic_menu_delete"
             android:layout_alignTop="@+id/toolbar_img_title"
             android:layout_alignBottom="@+id/toolbar_img_title"
-            android:layout_alignParentRight="true" />
+            android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
 

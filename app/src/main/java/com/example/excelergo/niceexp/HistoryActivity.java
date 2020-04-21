@@ -13,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class HistoryActivity extends AppCompatActivity {
     private MyHistoryAdapter myHistoryAdapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private RadioButton radioButton;
     private String[] titles={"历史记录","收藏"};
     private List<Fragment> list;
     private MyFragmentPagerAdapter pagerAdapter;
@@ -36,9 +38,10 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
         rl_history=findViewById(R.id.rl_history);
-        imageView_delete=findViewById(R.id.history_delete);
-        tabLayout=findViewById(R.id.tablay);
-        viewPager=findViewById(R.id.vp);
+        imageView_delete=(ImageView)findViewById(R.id.history_delete);
+        tabLayout=(TabLayout) findViewById(R.id.tablay);
+        viewPager=(ViewPager) findViewById(R.id.vp);
+        radioButton=(RadioButton) findViewById(R.id.rb_goBack);
         skinChangeAdapter=new SkinChangeAdapter();
         myHistoryAdapter=new MyHistoryAdapter(getApplicationContext());
         loadimg();//设置标题栏背景
@@ -84,6 +87,12 @@ public class HistoryActivity extends AppCompatActivity {
             @Override
             public void onPageScrollStateChanged(int i) {
 
+            }
+        });
+        radioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
         imageView_delete.setOnClickListener(new View.OnClickListener() {

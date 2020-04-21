@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="250dp"
+    android:layout_height="230dp"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/popuu_menu_shape"
     android:layout_gravity="bottom"
     android:layout_marginBottom="20dp"
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
-    tools:context=".MainActivity"
-    android:gravity="center">
+    tools:context=".MainActivity">
 <android.support.v7.widget.RecyclerView
     android:id="@+id/rv_popup_menu"
     android:layout_width="match_parent"
-    android:layout_height="260dp">
+    android:layout_height="230dp">
 
 </android.support.v7.widget.RecyclerView>
 </LinearLayout>

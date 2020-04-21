@@ -6,7 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import utils.GoBackAction;
 
@@ -14,13 +16,15 @@ public class SkinsActivity extends AppCompatActivity {
 private RecyclerView recyclerView;
 private SkinChangeAdapter adapter;
 private RelativeLayout rl_skin;
+private RadioButton radioButton;
 int skinposition;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_skins);
-        recyclerView=findViewById(R.id.rv_skins);
-        rl_skin=findViewById(R.id.rl_skin);
+        recyclerView=(RecyclerView) findViewById(R.id.rv_skins);
+        rl_skin=(RelativeLayout) findViewById(R.id.rl_skin);
+        radioButton=(RadioButton)findViewById(R.id.rb_goBack_skin);
         adapter=new SkinChangeAdapter();
         RecyclerView.LayoutManager manager=new LinearLayoutManager(getApplicationContext());
         ((LinearLayoutManager) manager).setOrientation(LinearLayout.VERTICAL);
@@ -38,7 +42,14 @@ int skinposition;
             }
         });
             loadimg();
+            radioButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    finish();
+                }
+            });
     }
+
     private void loadimg(){
         SharedPreferences sharedPreferences=getSharedPreferences("img",MODE_PRIVATE);
         skinposition=sharedPreferences.getInt("img",0);

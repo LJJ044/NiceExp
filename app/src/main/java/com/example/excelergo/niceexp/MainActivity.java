@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -135,9 +137,12 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         init();
         initAdapter();
         loadimg();//加载顶部栏皮肤
-        GridLayoutManager manager=new GridLayoutManager(getApplicationContext(),2);
-        manager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        recyclerView.setLayoutManager(manager);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 5, GridLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new GridSpacingItemDecoration(5, 10, true));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(popupMenuAdapter);
+
         initSetAdapter();
         ScaleAnimation scaleAnimation=new ScaleAnimation(0.0f,1.0f,0.0f,1.0f,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
         scaleAnimation.setDuration(500);
@@ -421,10 +426,10 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
             list.add(new PageHistory(R.drawable.skin, "更换皮肤"));
             list.add(new PageHistory(R.drawable.setting, "设置"));
             list.add(new PageHistory(R.drawable.night, "夜间模式"));
-            list.add(new PageHistory(R.drawable.full_screen, "开启全屏"));
+            list.add(new PageHistory(R.drawable.fullscreen, "开启全屏"));
             list.add(new PageHistory(R.drawable.share, "分享"));
             list.add(new PageHistory(R.drawable.refresh, "刷新"));
-            list.add(new PageHistory(R.drawable.clear1, "清除"));
+            list.add(new PageHistory(R.drawable.clearcache, "清除"));
             list.add(new PageHistory(R.drawable.exit, "退出"));
 
         }
@@ -451,7 +456,23 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                             break;
                         case 2:popupmenu.setVisibility(View.GONE);
                             startActivity(new Intent(MainActivity.this,SkinsActivity.class));
-
+                            break;
+                        case 3:
+                            popupmenu.setVisibility(View.GONE);
+                            startActivity(new Intent(MainActivity.this,SettingActivity.class));
+                            finish();
+                            break;
+                        case 4:
+                            //夜间模式实现
+                            popupmenu.setVisibility(View.GONE);
+                            int currentMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+                            if (currentMode == Configuration.UI_MODE_NIGHT_NO) {
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                                recreate();
+                            } else {
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                                recreate();
+                            }
                             break;
                             //全屏实现
                         case 5:
@@ -491,27 +512,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                             Animation animation=AnimationUtils.loadAnimation(getApplicationContext(),R.anim.popup_menu_anim);
                             share_page.startAnimation(animation);
                             share_page.setVisibility(View.VISIBLE);
-
-
                             break;
-                        case 3:
-                            popupmenu.setVisibility(View.GONE);
-                            startActivity(new Intent(MainActivity.this,SettingActivity.class));
-                            finish();
-                        break;
-                        case 4:
-                            //夜间模式实现
-                            popupmenu.setVisibility(View.GONE);
-                            int currentMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-                            if (currentMode == Configuration.UI_MODE_NIGHT_NO) {
-                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                                 recreate();
-                            } else {
-                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                               recreate();
 
-                            }
-                            break;
                         case 7:
                             popupmenu.setVisibility(View.GONE);
                             webView.reload();
@@ -553,6 +555,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 super(itemView);
                 imageView=itemView.findViewById(R.id.popup_logo);
                 textView=itemView.findViewById(R.id.popup_title);
+
+
             }
         }
     }

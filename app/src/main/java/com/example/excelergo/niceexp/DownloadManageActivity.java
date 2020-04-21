@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import java.io.File;
@@ -22,7 +23,7 @@ import utils.OnFileSelectedCallBack;
 
 public class DownloadManageActivity extends AppCompatActivity {
 private RecyclerView rv_file;
-private ImageView goBack_img;
+private RadioButton goBack_img;
 private TextView tv_state;
 private List<String> fileName;
 private MyFileDownloadAdapter fileDownloadAdapter;
@@ -31,7 +32,7 @@ private MyFileDownloadAdapter fileDownloadAdapter;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download_manage);
         rv_file=(RecyclerView)findViewById(R.id.rv_fileName);
-        goBack_img=(ImageView) findViewById(R.id.goBack_download);
+        goBack_img=(RadioButton) findViewById(R.id.goBack_download);
         tv_state=(TextView)findViewById(R.id.state_check);
         fileName=FileDownloadutil.listAllFileNmae();
         if(fileName.size()==0){
