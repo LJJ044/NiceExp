@@ -48,7 +48,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+
+import utils.GoBackAction;
 import utils.GoBackEndCallBack;
+import utils.OnProgressChangeCallBack;
 import utils.OnScrollChangeCallback;
 import static com.example.excelergo.niceexp.MainActivity.bottom_bar;
 import static com.example.excelergo.niceexp.MainActivity.popupmenu;
@@ -74,7 +77,7 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
     public static RelativeLayout url_hint;
     int currentMode ;
     public static Handler handler_page;
-    private ProgressDialog dialog;
+    public ProgressDialog dialog;
     int pageSlide,noImge,noCache;
     public static String css = "javascript: (function() {\n" +
             "  \n" +
@@ -266,39 +269,46 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
         webView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(final String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+
                 new AlertDialog.Builder(getContext())
                         .setMessage("即将下载文件?")
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface di, int i) {
-                               GetFileFromUrlUtil.getFileFromUrl(url,handler_page,null);
-                               dialog=new ProgressDialog(getContext());
-                               dialog.setTitle("文件下载中");
-                               dialog.setCancelable(false);
-                               dialog.setButton("后台下载", new DialogInterface.OnClickListener() {
+                               dialog=new ProgressDialog(getContext()) ;
+                               GetFileFromUrlUtil.getFileFromUrl(url, handler_page, new OnProgressChangeCallBack() {
+                                   @Override
+                                   public void OnChangeState(int length, int total) {
+                                       dialog.setMax(length);
+                                       dialog.setProgress(total);
+                                       Log.i("状态",String.valueOf(total));
+                                   }
+                               });
+
+
+                                dialog.setIcon(R.drawable.appicon);
+                                dialog.setTitle("NiceExp提示您");
+                                dialog.setMessage("文件下载中");
+                                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                                dialog.setCancelable(false);
+                                dialog.setButton("取消", new DialogInterface.OnClickListener() {
+                                   @Override
+                                   public void onClick(DialogInterface dialogInterface, int i) {
+                                   GetFileFromUrlUtil.setCallBack(new GoBackEndCallBack() {
+                                       @Override
+                                       public void BackEnd() {
+                                       }
+
+                                   });
+                                   }
+                               });
+                                dialog.setButton2("后台下载", new DialogInterface.OnClickListener() {
                                    @Override
                                    public void onClick(DialogInterface dialogInterface, int i) {
                                        dialog.dismiss();
                                    }
                                });
-                               dialog.setButton2("取消", new DialogInterface.OnClickListener() {
-                                   @Override
-                                   public void onClick(DialogInterface dialogInterface, int i) {
-                                       GetFileFromUrlUtil.getFileFromUrl(url, handler_page, new GoBackEndCallBack() {
-                                           @Override
-                                           public void BackEnd(FileOutputStream outputStream, InputStream inputStream) {
-                                               try {
-                                                   outputStream.close();
-                                                   inputStream.close();
-                                                   FileDownloadutil.deleteFile();
-                                               } catch (IOException e) {
-                                                   e.printStackTrace();
-                                               }
-                                           }
-                                       });
-                                   }
-                               });
-                               dialog.show();
+                                dialog.show();
 
                         }
                         })

@@ -6,5 +6,5 @@ import java.net.HttpURLConnection;
 
 
 public interface GoBackEndCallBack {
-    void BackEnd(FileOutputStream outputStream,InputStream inputStream);
+    void BackEnd();
 }

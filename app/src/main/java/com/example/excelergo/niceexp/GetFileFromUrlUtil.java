@@ -1,8 +1,10 @@
 package com.example.excelergo.niceexp;
 
+import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,10 +16,12 @@ import java.net.URL;
 
 import utils.GoBackAction;
 import utils.GoBackEndCallBack;
+import utils.OnProgressChangeCallBack;
 
 public class GetFileFromUrlUtil {
     static FileOutputStream fileOutputStream=null;
-    public static void getFileFromUrl(final String url, final Handler handler, final GoBackEndCallBack callBack){
+    static GoBackEndCallBack callBack;
+    public static void getFileFromUrl(final String url, final Handler handler, final OnProgressChangeCallBack progressChangeCallBack){
     new Thread(new Runnable() {
         @Override
         public void run() {
@@ -29,29 +33,28 @@ public class GetFileFromUrlUtil {
                 connection.setConnectTimeout(8000);
                 connection.setReadTimeout(8000);
                 InputStream is=connection.getInputStream();
-                if(callBack!=null){
-                    callBack.BackEnd(fileOutputStream,is);
-                    Message message=new Message();
-                    message.what=99;
-                    handler.sendMessage(message);
-                }else {
-                handleFileContent(url, is, handler);
-                }
+                handleFileContent(connection,url, is, handler,progressChangeCallBack);
+
 
             }catch (IOException e){
                 e.printStackTrace();
             }finally {
                 {
-                    connection.disconnect();
+                    if(connection!=null) {
+                        connection.disconnect();
+                    }
                 }
             }
         }
     }).start();
     }
-    private static void handleFileContent(String url,InputStream inputStream,Handler handler){
+    private static void handleFileContent(HttpURLConnection connection,String url,InputStream inputStream,Handler handler,OnProgressChangeCallBack progressChangeCallBack){
         File file=new File(FileDownloadutil.createFile(url).getAbsolutePath());
         if(inputStream!=null){
-            int length;
+            int length=0;
+            int n=0;
+            int total=0;
+            int contentLength=connection.getContentLength();
             byte[] buff=new byte[2*1024];
             try {
                 fileOutputStream=new FileOutputStream(file);
@@ -60,28 +63,50 @@ public class GetFileFromUrlUtil {
             }
             do{
                 try {
-                    if((length=inputStream.read(buff))<=0){
+                    if((length=inputStream.read(buff))<=0) {
                         break;
-
                     }
                     fileOutputStream.write(buff,0,length);
+                    while (n<100)
+                        n++;
+                        total += length;
+
+
+                    if (progressChangeCallBack != null) {
+                        progressChangeCallBack.OnChangeState(contentLength,total);
+                    }
+                    if(callBack!=null){
+                        fileOutputStream=null;
+                        callBack.BackEnd();
+                        Message message=new Message();
+                        message.what=99;
+                        handler.sendMessage(message);
+                        break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }while (true);
+                Log.i("字节数",String.valueOf(contentLength));
+        }while (true);
 
             try {
                 if(fileOutputStream!=null) {
                     fileOutputStream.flush();
                     fileOutputStream.close();
+                    Message message=new Message();
+                    message.what=100;
+                    handler.sendMessage(message);
                 }
                 inputStream.close();
+                callBack=null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        Message message=new Message();
-        message.what=100;
-        handler.sendMessage(message);
+
+    }
+
+    public static void setCallBack(GoBackEndCallBack callBack) {
+        GetFileFromUrlUtil.callBack = callBack;
     }
 }
