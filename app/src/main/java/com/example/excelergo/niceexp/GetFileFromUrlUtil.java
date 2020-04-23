@@ -76,6 +76,7 @@ public class GetFileFromUrlUtil {
                         progressChangeCallBack.OnChangeState(contentLength,total);
                     }
                     if(callBack!=null){
+                        fileOutputStream.close();
                         fileOutputStream=null;
                         callBack.BackEnd();
                         Message message=new Message();
