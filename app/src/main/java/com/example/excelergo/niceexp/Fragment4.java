@@ -65,6 +65,11 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment4, container, false);
         init(view);
+        loadWeatherData();//加载天气数据
+        initListener();
+        loadTouxiang();//加载头像
+        readsign();//读取签名内容
+        handler.sendEmptyMessage(1);
         mpullToRefreshView.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -79,12 +84,6 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
                 }, 1000);
             }
         });
-        //loadWeatherData();//加载天气数据
-        initListener();
-        loadTouxiang();//加载头像
-        readsign();//读取签名内容
-
-        handler.sendEmptyMessage(1);
         return view;
     }
 

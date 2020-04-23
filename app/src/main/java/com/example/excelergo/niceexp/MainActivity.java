@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     private RadioGroup radioGroup;
     public static MyViewPager viewPager;
     private ListView listView,listView2;
-    private ImageView imageView,imageView2,modeswitch;
+    private ImageView imageView,imageView2;
     private DrawerLayout drawerLayout,drawerLayout2;
     private MyDrawerAdapter myAdapterRight;
     private MyDrawerAdapterLeft myAdapterLeft;
@@ -116,8 +116,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         getCssFile();
         onCreate();
         createFileDir();//创建应用主文件夹
-        //locationService=((LocationApplication)getApplication()).locationService;
-        locationService=new LocationService(getApplicationContext());
+        locationService=((NiceExpApplication)getApplication()).locationService;
         locationService.registerListener(myListener);
         locationService.start();
         LocationClientOption option = new LocationClientOption();
@@ -272,8 +271,6 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         share_page=findViewById(R.id.share_pop);
         recyclerView=findViewById(R.id.rv_popup_menu);
         popupmenu=findViewById(R.id.popupmenu);
-        modeswitch=findViewById(R.id.modeswitch);
-        modeswitch.setVisibility(View.GONE);
         viewPager.setOffscreenPageLimit(4);
         btn1.setChecked(true);
         wechat_rl.setOnClickListener(this);
@@ -375,14 +372,14 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     }
 
     private void initurl(){
-        SharedPreferences sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("locationdata", Context.MODE_PRIVATE);
         lastLocation = sharedPreferences.getInt("history", 0);
         lasturl=sharedPreferences.getString("lasturl",null);
         Log.i("轻型数据库", String.valueOf(lastLocation));
         Log.i("轻型数据库", lasturl);
         if(!lasturl.equals("")) {
             webView.loadUrl(lasturl);
-            if(lastLocation<=20000) {
+            if(lastLocation<20000) {
                 Log.i("检测",String.valueOf(lastLocation));
                 webView.scrollTo(0,lastLocation);
             }

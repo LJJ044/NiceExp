@@ -17,7 +17,8 @@
         android:drawableEnd="@drawable/goback"
         android:layout_alignTop="@+id/toolbar_img_title"
         android:layout_alignBottom="@+id/toolbar_img_title"
-        android:layout_marginStart="20dp"/>
+        android:layout_marginStart="20dp"
+        android:paddingEnd="5dp"/>
     <TextView
         android:id="@+id/toolbar_img_title"
         android:layout_width="match_parent"

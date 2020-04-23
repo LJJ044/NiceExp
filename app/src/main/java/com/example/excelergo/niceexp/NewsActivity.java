@@ -16,9 +16,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
-
 import static com.example.excelergo.niceexp.Fragment2.css;
-import static com.example.excelergo.niceexp.Fragment2.webView;
+
 
 public class NewsActivity extends AppCompatActivity implements View.OnTouchListener {
 private WebView webView3;
@@ -66,7 +65,7 @@ private GestureDetector detector;
                 int currentMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
                 if(currentMode==Configuration.UI_MODE_NIGHT_YES){
                     view.loadUrl(css);
-                    webView.setBackgroundColor(getResources().getColor(R.color.pure_black));
+                    view.setVisibility(newProgress==100? View.VISIBLE:View.GONE);
                 }
             }
         });

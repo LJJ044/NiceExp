@@ -16,9 +16,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.squareup.okhttp.OkHttpClient;
-
 import static com.example.excelergo.niceexp.Fragment2.css;
-import static com.example.excelergo.niceexp.Fragment2.webView;
 import static com.example.excelergo.niceexp.MainActivity.css2;
 
 public class Fragment1 extends Fragment implements View.OnTouchListener{
@@ -61,9 +59,8 @@ int currentMode ;
                 super.onProgressChanged(view, newProgress);
 
                 if (currentMode == Configuration.UI_MODE_NIGHT_YES) {
-                    Webview2.loadUrl(css);
-                    webView.setBackgroundColor(getResources().getColor(R.color.pure_black));
-                    webView.setVisibility(newProgress == 100 ? View.VISIBLE : View.INVISIBLE);
+                    view.loadUrl(css);
+                    view.setVisibility(newProgress == 100 ? View.VISIBLE : View.INVISIBLE);
                 }else {
                     view.setVisibility(newProgress == 100 ? View.VISIBLE : View.INVISIBLE);
                 }

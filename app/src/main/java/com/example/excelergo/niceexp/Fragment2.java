@@ -27,6 +27,7 @@ import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebBackForwardList;
@@ -48,11 +49,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.Objects;
 
 import utils.GoBackAction;
 import utils.GoBackEndCallBack;
 import utils.OnProgressChangeCallBack;
 import utils.OnScrollChangeCallback;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.example.excelergo.niceexp.MainActivity.bottom_bar;
 import static com.example.excelergo.niceexp.MainActivity.popupmenu;
 import static com.example.excelergo.niceexp.MainActivity.share_page;
@@ -98,9 +102,11 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment2, container, false);
         //getCssFile();
+        adapter=new URLSQLiteAdapter(getContext());
         currentMode=getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         settingRecyclerAdapter=new MySettingRecyclerAdapter();
         initView(view);//初始化控件;
+
         initListener();//初始化点击监听
         //弹出上次浏览记录的窗口
         url_hint.setVisibility(View.VISIBLE);
@@ -118,7 +124,7 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
         return view;
     }
     private void loadSwitchState(){
-        SharedPreferences sp=getContext().getSharedPreferences("switch",Context.MODE_PRIVATE);
+        SharedPreferences sp= Objects.requireNonNull(getContext()).getSharedPreferences("switch",Context.MODE_PRIVATE);
         pageSlide=sp.getInt("pageSlide",-1);
         noImge=sp.getInt("noImge",-1);
         noCache=sp.getInt("noCache",-1);
@@ -178,7 +184,6 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
                     PageHistory pageHistory = new PageHistory();
                     pageHistory.setTitle(backTitle);
                     pageHistory.setUrl(backUrl);
-                    adapter=new URLSQLiteAdapter(getContext());
                     if(noCache!=2) {
                         adapter.insertHistory(pageHistory);
                     }
@@ -206,6 +211,8 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
         et_area = view.findViewById(R.id.et_area);
         url_hint=view.findViewById(R.id.url_hint);
         webView.addJavascriptInterface(new InJavaScriptLocalObject(), "java_obj");
+        editText.requestFocus();
+
     }
     private void initListener(){
         webView.setOnTouchListener(this);//给WebView绑定触摸监听
@@ -394,7 +401,6 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
                 view.loadUrl("javascript:window.java_obj.getSource('<head>'+" +
                         "document.getElementsByTagName('html')[0].innerHTML+'</head>');");
                 super.onPageFinished(view, url);
-                myLastUrl();
                 if(webView.canGoBack()){
                     imageGoback.setImageResource(R.drawable.backspace);
                 }else {
@@ -414,9 +420,11 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
+                progressBar.setMax(100);
                 progressBar.setProgress(newProgress);
                 progressBar.setVisibility(newProgress==100?View.INVISIBLE:View.VISIBLE);
                     editText.setText(getCurrentUrl()[1]);
+                    myLastUrl();
                     insertSearchHistory();
                     Bitmap bitmap = ImgeClipUtil.getLocalBitmap(BitmapFileutil.ImgPath+ webView.getTitle() + ".jpg");//加载从网络存储到本地的图标
                     if (bitmap != null) {
@@ -429,9 +437,7 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
                     if (currentMode == Configuration.UI_MODE_NIGHT_YES) {
                         view.loadUrl(css);
                         //view.loadUrl("javascript:function()");
-                        webView.setVisibility(newProgress==100?View.VISIBLE:View.INVISIBLE);
-                    }else {
-                        webView.setVisibility(newProgress==100?View.VISIBLE:View.INVISIBLE);
+                        view.setVisibility(newProgress==100?View.VISIBLE:View.INVISIBLE);
                     }
 
 
@@ -506,21 +512,25 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
     private void insertSearchHistory(){
         String oldurl=getCurrentUrl()[0];
         String oldtitle=getCurrentUrl()[1];
-        SharedPreferences sp=getContext().getSharedPreferences("olddata",Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor=sp.edit();
-        editor.putString("oldurl",oldurl);
-        editor.putString("oldtitle",oldtitle);
-        editor.apply();
-        Log.i("轻型数据库olddata",oldurl);
+        SharedPreferences sp= Objects.requireNonNull(getContext()).getSharedPreferences("olddata",Context.MODE_PRIVATE);
+        if(sp!=null) {
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString("oldurl", oldurl);
+            editor.putString("oldtitle", oldtitle);
+            editor.apply();
+        }
+            Log.i("轻型数据库olddata", oldurl);
+
     }
     //当前网页浏览记录插入SharedPreferences
     private void inserthistory() {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("history", lastLocation);
-        editor.putString("lasturl",lasturl);
-        editor.apply();
-
+        SharedPreferences sharedPreferences = Objects.requireNonNull(getContext()).getSharedPreferences("locationdata", Context.MODE_PRIVATE);
+        if(sharedPreferences!=null) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("history", lastLocation);
+            editor.putString("lasturl", lasturl);
+            editor.apply();
+        }
     }
 
 //webview触摸监听
@@ -570,7 +580,7 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
                 }
                 break;
             case R.id.et_url:
-                  Intent intent=new Intent(getActivity(),SearchHistoryActivity.class);
+                Intent intent=new Intent(getActivity(),SearchHistoryActivity.class);
                   intent.putExtra("url",editText.getText().toString());
                   startActivity(intent);
                 break;

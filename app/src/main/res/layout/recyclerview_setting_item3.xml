@@ -22,12 +22,6 @@
         android:thumb="@drawable/switch_thumb"
         android:track="@drawable/switch_track"
         android:focusable="true"/>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/login_hint_color"
-        android:layout_below="@id/tv_noImge"
-        android:layout_marginTop="10dp"/>
-        />
+
 </RelativeLayout>
 </LinearLayout>
