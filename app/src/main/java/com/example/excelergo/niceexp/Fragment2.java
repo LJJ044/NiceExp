@@ -304,6 +304,7 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
                                    GetFileFromUrlUtil.setCallBack(new GoBackEndCallBack() {
                                        @Override
                                        public void BackEnd() {
+                                           FileDownloadutil.deleteFile();
                                        }
 
                                    });
