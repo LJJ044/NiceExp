@@ -11,6 +11,7 @@
     android:layout_width="match_parent"
     android:layout_height="60dp"
     android:background="#f2dc32">
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -20,9 +21,9 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="10dp"/>
 </RelativeLayout>
-    <WebView
+    <com.example.excelergo.niceexp.MyWebView
         android:id="@+id/wv"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </WebView>
+    </com.example.excelergo.niceexp.MyWebView>
 </LinearLayout>

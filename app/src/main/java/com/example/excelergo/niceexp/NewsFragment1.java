@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.PullToRefreshView;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -30,12 +32,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import utils.OnJsonStringCallBack;
+import utils.OnScrollChangeCallback;
+
+import static com.example.excelergo.niceexp.MainActivity.refreshLayout;
 
 public class NewsFragment1 extends Fragment {
     private RecyclerView recyclerView;
     private MyAdapter myAdapter;
+    private MyScrollView myScrollView;
     private List<NewsBean> newsBeanList;
-    JSONObject jsonObjectResult;
+    private JSONObject jsonObjectResult;
+    private JsonNewsSQliteAdapter newsSQliteAdapter;
     public NewsFragment1() {
     }
 
@@ -44,14 +51,45 @@ public class NewsFragment1 extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_news_fragment1, container, false);
         recyclerView = view.findViewById(R.id.rv_1);
+        myScrollView=view.findViewById(R.id.mySv1);
+        newsSQliteAdapter=JsonNewsSQliteAdapter.getInstance(getContext());
         newsBeanList = new ArrayList<>();
         init();
-        handler.sendEmptyMessage(2);
         myAdapter=new MyAdapter();
         recyclerView.setAdapter(myAdapter);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
+        myScrollView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(motionEvent.getAction()==MotionEvent.ACTION_DOWN){
+                    refreshLayout.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
+                        @Override
+                        public void onRefresh() {
+                            init();
+                            refreshLayout.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    refreshLayout.setRefreshing(false);
+                                }
+                            },1000);
+                        }
+                    });
+                }
+                return false;
+            }
+        });
+        myScrollView.setMscrollChangeCallback(new OnScrollChangeCallback() {
+            @Override
+            public void onScroll(int dx, int dy, int dx_change, int dy_change) {
+                refreshLayout.setEnabled(false);
+                if(dy==0){
+              refreshLayout.setEnabled(true);
+            }
+        }
+        });
+
         return view;
     }
     //请求网络获取Json数据
@@ -60,19 +98,24 @@ private void init(){
             String url2 = "&key=33b5bc8bfd2c5a6775a74c0f35471c33";
             String url3 = "top";
             String f1News = url1 + url3 + url2;
-            MyOkHttpClientUtil.sendRequestForResult(f1News, new OnJsonStringCallBack() {
+         MyOkHttpClientUtil.sendRequestForResult(f1News, new OnJsonStringCallBack() {
                 @Override
                 public void goWithNewsString(String content) {
+                    Log.i("新闻Json",content);
                     try {
                         JSONObject jsonObject = new JSONObject(content);
                         jsonObjectResult = jsonObject.getJSONObject("result");
                         JSONArray jsonArray = jsonObjectResult.getJSONArray("data");
-                        for (int i = 0; i < 2; i++) {
+                        for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject jsonObject1 = jsonArray.getJSONObject(i);
                             String title = jsonObject1.getString("title");
                             String picture = jsonObject1.getString("thumbnail_pic_s");
                             String url = jsonObject1.getString("url");
-                            newsBeanList.add(new NewsBean(title, picture, url));
+                            if(jsonObjectResult!=null) {
+                                newsBeanList.add(new NewsBean(title, picture, url));
+                                newsSQliteAdapter.insetNewsItem("news_top",new NewsBean(title, picture, url));
+                            }
+
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -109,6 +152,9 @@ private void init(){
 
             @Override
             public int getItemCount() {
+                if(jsonObjectResult==null){
+                    newsBeanList=newsSQliteAdapter.queryAllNews("news_top");
+                }
                 return newsBeanList.size();
             }
 
@@ -124,19 +170,6 @@ private void init(){
             }
         }
 
-        private Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                switch (msg.what) {
-                    case 2:
-                        if (jsonObjectResult == null) {
-                            //Toast.makeText(getActivity(), "新闻请求次数已过", Toast.LENGTH_SHORT).show();
-                        }
-                        break;
-                }
-            }
-        };
 
 }
 

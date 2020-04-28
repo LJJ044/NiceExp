@@ -10,17 +10,19 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.webkit.ClientCertRequest;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
+
+import com.tencent.smtt.sdk.WebChromeClient;
+import com.tencent.smtt.sdk.WebSettings;
+import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
+
 import static com.example.excelergo.niceexp.Fragment2.css;
+import static com.example.excelergo.niceexp.Fragment2.css2;
 
 
 public class NewsActivity extends AppCompatActivity implements View.OnTouchListener {
-private WebView webView3;
+private MyWebView webView3;
 private URLSQLiteAdapter adapter;
 int skinposition;
 private RelativeLayout titl_rl;
@@ -31,12 +33,13 @@ private GestureDetector detector;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news);
         skinChangeAdapter=new SkinChangeAdapter();
-        webView3=findViewById(R.id.wv);
+        webView3=(MyWebView) findViewById(R.id.wv);
         detector=new GestureDetector(this,detectorlistener);
         webView3.setOnTouchListener(this);
         titl_rl=findViewById(R.id.title_bar_news);
         loadimg();
         initWebView();
+
         adapter=new URLSQLiteAdapter(this);
         Intent intent=getIntent();
         String url =intent.getStringExtra("url");
@@ -51,11 +54,6 @@ private GestureDetector detector;
                 super.onPageFinished(view, url);
             }
 
-            @Override
-            public void onReceivedClientCertRequest(WebView view, ClientCertRequest request) {
-                super.onReceivedClientCertRequest(view, request);
-            }
-
         });
 
         webView3.setWebChromeClient(new WebChromeClient(){
@@ -64,7 +62,7 @@ private GestureDetector detector;
                 super.onProgressChanged(view, newProgress);
                 int currentMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
                 if(currentMode==Configuration.UI_MODE_NIGHT_YES){
-                    view.loadUrl(css);
+                    view.loadUrl(css2);
                     view.setVisibility(newProgress==100? View.VISIBLE:View.GONE);
                 }
             }

@@ -7,11 +7,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
+import com.example.PullToRefreshView;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -24,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import utils.OnJsonStringCallBack;
+import utils.OnScrollChangeCallback;
+
+import static com.example.excelergo.niceexp.MainActivity.refreshLayout;
 
 
 /**
@@ -31,6 +36,9 @@ import utils.OnJsonStringCallBack;
  */
 public class NewsFragment8 extends Fragment {
     private RecyclerView recyclerView;
+    private MyScrollView myScrollView;
+    private JsonNewsSQliteAdapter newsSQliteAdapter;
+    private JSONObject jsonObjectResult;
     private MyAdapter myAdapter;
     private List<NewsBean> newsBeanList;
     public NewsFragment8() {
@@ -40,8 +48,10 @@ public class NewsFragment8 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_news_fragment4, container, false);
-        recyclerView = view.findViewById(R.id.rv_4);
+        View view = inflater.inflate(R.layout.fragment_news_fragment8, container, false);
+        recyclerView = view.findViewById(R.id.rv_8);
+        myScrollView=view.findViewById(R.id.mySv8);
+        newsSQliteAdapter=JsonNewsSQliteAdapter.getInstance(getContext());
         newsBeanList = new ArrayList<>();
         init();
         myAdapter=new MyAdapter();
@@ -49,6 +59,47 @@ public class NewsFragment8 extends Fragment {
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
+        MainActivity.refreshLayout.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                init();
+                MainActivity.refreshLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.refreshLayout.setRefreshing(false);
+                    }
+                },1000);
+            }
+        });
+        myScrollView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(motionEvent.getAction()==MotionEvent.ACTION_DOWN){
+                    refreshLayout.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
+                        @Override
+                        public void onRefresh() {
+                            init();
+                            refreshLayout.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    refreshLayout.setRefreshing(false);
+                                }
+                            },1000);
+                        }
+                    });
+                }
+                return false;
+            }
+        });
+        myScrollView.setMscrollChangeCallback(new OnScrollChangeCallback() {
+            @Override
+            public void onScroll(int dx, int dy, int dx_change, int dy_change) {
+                refreshLayout.setEnabled(false);
+                if(dy==0){
+                    refreshLayout.setEnabled(true);
+                }
+            }
+        });
         return view;
     }
     //请求网络获取Json数据
@@ -62,14 +113,17 @@ public class NewsFragment8 extends Fragment {
             public void goWithNewsString(String content) {
                 try {
                     JSONObject jsonObject = new JSONObject(content);
-                    JSONObject jsonObjectResult = jsonObject.getJSONObject("result");
+                    jsonObjectResult = jsonObject.getJSONObject("result");
                     JSONArray jsonArray = jsonObjectResult.getJSONArray("data");
-                    for (int i = 0; i < 2; i++) {
+                    for (int i = 0; i <jsonArray.length(); i++) {
                         JSONObject jsonObject1 = jsonArray.getJSONObject(i);
                         String title = jsonObject1.getString("title");
                         String picture = jsonObject1.getString("thumbnail_pic_s");
                         String url = jsonObject1.getString("url");
-                        newsBeanList.add(new NewsBean(title, picture, url));
+                        if(jsonObjectResult!=null) {
+                            newsBeanList.add(new NewsBean(title, picture, url));
+                            newsSQliteAdapter.insetNewsItem("news_keji",new NewsBean(title, picture, url));
+                        }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -106,6 +160,9 @@ public class NewsFragment8 extends Fragment {
 
         @Override
         public int getItemCount() {
+            if(jsonObjectResult==null){
+                newsBeanList=newsSQliteAdapter.queryAllNews("news_keji");
+            }
             return newsBeanList.size();
         }
 

@@ -5,12 +5,15 @@
     android:layout_height="match_parent"
     tools:context=".NewsFragment4">
 
-
+    <com.example.excelergo.niceexp.MyScrollView
+        android:id="@+id/mySv5"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_5"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
     </android.support.v7.widget.RecyclerView>
-
+    </com.example.excelergo.niceexp.MyScrollView>
 </FrameLayout>

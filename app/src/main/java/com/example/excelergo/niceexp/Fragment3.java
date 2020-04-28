@@ -48,6 +48,7 @@ private String[] titles={"头条","社会","国内","国际","娱乐","体育","
             for(int i=0;i<tabLayout.getTabCount();i++){
                 if(ta==tabLayout.getTabAt(i)){
                 viewPager.setCurrentItem(i);
+
                 }
             }
             }

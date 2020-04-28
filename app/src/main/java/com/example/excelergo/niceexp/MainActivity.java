@@ -6,14 +6,19 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.PermissionChecker;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
@@ -34,8 +39,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
-import android.webkit.WebBackForwardList;
-import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -53,11 +56,17 @@ import com.example.PullToRefreshView;
 import com.mylhyl.acp.Acp;
 import com.mylhyl.acp.AcpListener;
 import com.mylhyl.acp.AcpOptions;
+import com.tencent.smtt.sdk.WebBackForwardList;
+import com.tencent.smtt.sdk.WebHistoryItem;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import utils.OnScrollChangeCallback;
+
 import static com.example.excelergo.niceexp.Fragment1.Webview2;
 import static com.example.excelergo.niceexp.Fragment2.option_button;
 import static com.example.excelergo.niceexp.Fragment2.url_bar;
@@ -84,18 +93,18 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     private SkinChangeAdapter skinChangeAdapter;
     public static LocationService locationService;//百度定位服务
     public static LocationClient mLocationClient;
-    MyLocationListener myListener = new MyLocationListener();
+    MyLocationListener myListener=new MyLocationListener();
     int lastLocation;
     String lasturl;
     int skinposition;
     long exitTime=0;
-    public static String css2;
+    public static PullToRefreshView refreshLayout;
+    MyScrollView scrollView;
     String AppPath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/myinfo/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         //获取权限
         Acp.getInstance(this).request(new AcpOptions.Builder().setPermissions(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -110,11 +119,14 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
 
             @Override
             public void onDenied(List<String> permissions) {
+               /* if(permissions!=null){
+                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{}, REQUEST_PERMISSION);
+                }*/
                 System.out.println("Error:Please accept the permissions require");
             }
         });
-        getCssFile();
         onCreate();
+        //getCssFile();
         createFileDir();//创建应用主文件夹
         locationService=((NiceExpApplication)getApplication()).locationService;
         locationService.registerListener(myListener);
@@ -210,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
             }
         });
     }
+
     private void createFileDir(){
         File file=new File(AppPath);
         if(!file.exists()){
@@ -231,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 e.printStackTrace();
             }
         }
-        css2=Base64.encodeToString(buff,Base64.NO_WRAP);
+        //css2=Base64.encodeToString(buff,Base64.NO_WRAP);
     }
     private void initSetAdapter(){
         recyclerView.setAdapter(popupMenuAdapter);
@@ -247,7 +260,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         skinChangeAdapter=new SkinChangeAdapter();////实例化皮肤适配器
     }
     private void init(){
-
+        scrollView=(MyScrollView) findViewById(R.id.sv);
+        refreshLayout=(PullToRefreshView) findViewById(R.id.pulltorefresh);
         radioGroup=(RadioGroup) findViewById(R.id.rg);
         viewPager=(MyViewPager) findViewById(R.id.vp);
         btn1=(RadioButton) findViewById(R.id.btn_1);
@@ -295,10 +309,12 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
             case R.id.btn_3:
                 viewPager.setCurrentItem(2);
                 btn3.startAnimation(animation);
+                refreshLayout.setEnabled(true);
                 break;
             case R.id.btn_4:
                 viewPager.setCurrentItem(3);
                 btn4.startAnimation(animation);
+                refreshLayout.setEnabled(true);
                 break;
         }
     }
@@ -337,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode==KeyEvent.KEYCODE_BACK){
             if(popupmenu.getVisibility()==View.VISIBLE){
-                popupmenu.setVisibility(View.GONE);;
+                popupmenu.setVisibility(View.GONE);
             }else if(webView.canGoBack()) {
                 webView.goBack();
             }else if(System.currentTimeMillis()-exitTime>2000){
@@ -361,31 +377,29 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         url_hint.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(motionEvent.getAction()==MotionEvent.ACTION_DOWN){
-                    initurl();
-                    url_hint.setVisibility(View.GONE);
-                }
+                    if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                        initurl();
+                    }
+
                 return false;
             }
         });
         return super.dispatchTouchEvent(ev);
     }
-
     private void initurl(){
         SharedPreferences sharedPreferences = getSharedPreferences("locationdata", Context.MODE_PRIVATE);
         lastLocation = sharedPreferences.getInt("history", 0);
         lasturl=sharedPreferences.getString("lasturl",null);
-        Log.i("轻型数据库", String.valueOf(lastLocation));
-        Log.i("轻型数据库", lasturl);
+        Log.i("轻量数据库", String.valueOf(lastLocation));
+        Log.i("轻量数据库", lasturl);
         if(!lasturl.equals("")) {
             webView.loadUrl(lasturl);
-            if(lastLocation<20000) {
-                Log.i("检测",String.valueOf(lastLocation));
-                webView.scrollTo(0,lastLocation);
-            }
-        }else {
+          /*  webView.scrollBy(0,lastLocation);
+            Log.i("检测",String.valueOf(lastLocation));*/
+        } else {
             webView.loadUrl("https://www.qq.com");
         }
+        url_hint.setVisibility(View.GONE);
     }
 //网址分享
     @Override
@@ -422,7 +436,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
             list.add(new PageHistory(R.drawable.addfav, "加入收藏"));
             list.add(new PageHistory(R.drawable.skin, "更换皮肤"));
             list.add(new PageHistory(R.drawable.setting, "设置"));
-            list.add(new PageHistory(R.drawable.night, "夜间模式"));
+            list.add(new PageHistory(R.drawable.night, getResources().getString(R.string.nightMode)));
             list.add(new PageHistory(R.drawable.fullscreen, "开启全屏"));
             list.add(new PageHistory(R.drawable.share, "分享"));
             list.add(new PageHistory(R.drawable.refresh, "刷新"));
@@ -581,6 +595,32 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         //声明LocationClient类
         mLocationClient.registerLocationListener(myListener);
         //注册监听函数
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case 1:
+                for(int i=0;i<permissions.length;i++){
+                    if(grantResults[i]== PackageManager.PERMISSION_GRANTED){
+                        System.out.println("Permissions -->"+"Permissions Granted" +permissions[i]);
+                    }else {
+                       ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.CAMERA},1);
+                        System.out.println("Permissions -->"+"Permissions Denied" +permissions[i]);
+                    }
+                }
+                break;
+            case 2:for(int i=0;i<permissions.length;i++){
+                if(grantResults[i]== PackageManager.PERMISSION_GRANTED){
+                    System.out.println("Permissions -->"+"Permissions Granted" +permissions[i]);
+                }else {
+                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},2);
+                    System.out.println("Permissions -->"+"Permissions Denied" +permissions[i]);
+                }
+            }
+                break;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
 }

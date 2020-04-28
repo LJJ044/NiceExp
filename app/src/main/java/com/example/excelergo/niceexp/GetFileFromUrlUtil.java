@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import utils.GoBackAction;
 import utils.GoBackEndCallBack;
 import utils.OnProgressChangeCallBack;
 
@@ -110,4 +108,5 @@ public class GetFileFromUrlUtil {
     public static void setCallBack(GoBackEndCallBack callBack) {
         GetFileFromUrlUtil.callBack = callBack;
     }
+
 }

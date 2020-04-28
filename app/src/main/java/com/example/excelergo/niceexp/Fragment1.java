@@ -11,16 +11,21 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import com.example.PullToRefreshView;
 import com.squareup.okhttp.OkHttpClient;
+import com.tencent.smtt.sdk.WebChromeClient;
+import com.tencent.smtt.sdk.WebSettings;
+import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
+
+import utils.OnScrollChangeCallback;
+
 import static com.example.excelergo.niceexp.Fragment2.css;
-import static com.example.excelergo.niceexp.MainActivity.css2;
+import static com.example.excelergo.niceexp.Fragment2.css2;
+import static com.example.excelergo.niceexp.MainActivity.refreshLayout;
 
 public class Fragment1 extends Fragment implements View.OnTouchListener{
-public static WebView Webview2;
+public static MyWebView Webview2;
 private GestureDetector detector;//手势监听
 String temp,weather;
 int currentMode ;
@@ -53,13 +58,41 @@ int currentMode ;
             }
 
         });
+        Webview2.setChangeCallback(new OnScrollChangeCallback() {
+            @Override
+            public void onScroll(int dx, int dy, int dx_change, int dy_change) {
+                refreshLayout.setEnabled(false);
+                if (dy == 0) {
+                    refreshLayout.setEnabled(true);
+                }
+            }
+        });
+        Webview2.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(motionEvent.getAction()==MotionEvent.ACTION_DOWN){
+                    refreshLayout.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
+                        @Override
+                        public void onRefresh() {
+                            Webview2.reload();
+                            refreshLayout.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    refreshLayout.setRefreshing(false);
+                                }
+                            },1000);
+                        }
+                    });
+                }
+                return false;
+            }
+        });
         Webview2.setWebChromeClient(new WebChromeClient(){
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-
                 if (currentMode == Configuration.UI_MODE_NIGHT_YES) {
-                    view.loadUrl(css);
+                    view.loadUrl(css2);
                     view.setVisibility(newProgress == 100 ? View.VISIBLE : View.INVISIBLE);
                 }else {
                     view.setVisibility(newProgress == 100 ? View.VISIBLE : View.INVISIBLE);

@@ -1,7 +1,10 @@
 package com.example.excelergo.niceexp;
 
 public class NewsBean {
-    public NewsBean(String title,String img,String url) {
+    public NewsBean() {
+    }
+
+    public NewsBean(String title, String img, String url) {
         this.title = title;
         this.img = img;
         this.url = url;

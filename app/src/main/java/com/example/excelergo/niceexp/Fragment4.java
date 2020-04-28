@@ -1,6 +1,9 @@
 package com.example.excelergo.niceexp;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -11,9 +14,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -25,21 +31,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.PullToRefreshView;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import utils.OnJsonStringCallBack;
-
+import java.net.HttpURLConnection;
+import java.net.URL;
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
+import static com.example.excelergo.niceexp.MainActivity.refreshLayout;
 import static com.example.excelergo.niceexp.MainActivity.tv_temp;
 import static com.example.excelergo.niceexp.MainActivity.tv_weather;
 
@@ -51,9 +55,9 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
     private EditText editText;
     private LinearLayout popup_choose;
     private Bitmap head;
-    private PullToRefreshView mpullToRefreshView;
     static String city2;
     String temp, weather;
+    JSONObject jsonObject1;
     private String headFilePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/myinfo/userInfo/";
     public Fragment4() {
 
@@ -65,28 +69,45 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment4, container, false);
         init(view);
-        loadWeatherData();//加载天气数据
         initListener();
+        loadUser();//加载用户
         loadTouxiang();//加载头像
         readsign();//读取签名内容
-        handler.sendEmptyMessage(1);
-        mpullToRefreshView.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mpullToRefreshView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mpullToRefreshView.setRefreshing(false);
-                        loadWeatherData();
-                        handler.sendEmptyMessage(1);
+        loadWeatherData();//加载天气数据
 
-                    }
-                }, 1000);
+        mainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(motionEvent.getAction()== MotionEvent.ACTION_DOWN){
+                    refreshLayout.setOnRefreshListener(new PullToRefreshView.OnRefreshListener() {
+                        @Override
+                        public void onRefresh() {
+                            if(MainActivity.locationService.isStart()!=true){
+                                MainActivity.locationService.start();
+                                MainActivity.mLocationClient.start();
+                            }
+                            loadWeatherData();
+                            refreshLayout.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    refreshLayout.setRefreshing(false);
+                                }
+                            },1000);
+                        }
+                    });
+                }
+                return false;
             }
         });
         return view;
     }
-
+    private void loadUser(){
+        SharedPreferences sp=getContext().getSharedPreferences("user",MODE_PRIVATE);
+        String userName=sp.getString("userName",null);
+        if(userName!=null) {
+            tv_user.setText("用户名：" + userName);
+        }
+    }
     @Override
     public void onClick(View view) {
         Uri uri;
@@ -132,11 +153,18 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
                 break;
             //打开相机
             case R.id.open_camera:
-                Intent intent2 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                intent2.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-                startActivityForResult(intent2, 2);// 采用ForResult打开
-                popup_choose.setVisibility(View.GONE);
-                break;
+                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M) {
+                    int hasCameraPermission = getActivity().checkCallingOrSelfPermission(Manifest.permission.CAMERA);
+                    if (hasCameraPermission != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, 1);
+                    } else {
+                        Intent intent2 = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        intent2.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                        startActivityForResult(intent2, 2);// 采用ForResult打开
+                        popup_choose.setVisibility(View.GONE);
+                        break;
+                    }
+                }
 
 
         }
@@ -222,7 +250,6 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
     }
 
     private void init(View view) {
-        mpullToRefreshView = (PullToRefreshView) view.findViewById(R.id.pulltorefresh);
         login_img = view.findViewById(R.id.head_img);
         tv_user = view.findViewById(R.id.userName);
         tv_location4 = view.findViewById(R.id.tv_location);
@@ -286,43 +313,86 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
     public void loadWeatherData() {
                 String head1 = "http://apis.juhe.cn/simpleWeather/query?city=";
                 String head3 = "&key=460f4b8be1eeda3f990cde2604ad5279";
-                String weatherStr=head1 + city2 + head3;
-                MyOkHttpClientUtil.sendRequestForResult(weatherStr, new OnJsonStringCallBack() {
-                    @Override
-                    public void goWithNewsString(String content) {
-                        try {
-                            handleData(content);
+                final String weatherStr=head1 + city2 + head3;
 
-                        } catch (Exception e) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            URL url = new URL(weatherStr);
+                            HttpURLConnection connection=(HttpURLConnection) url.openConnection();
+                            connection.setConnectTimeout(5000);
+                            connection.setReadTimeout(5000);
+                            connection.setRequestMethod("GET");
+                            InputStream is=connection.getInputStream();
+                            handleData(is);
+                        }catch (IOException e){
                             e.printStackTrace();
                         }
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(weather!=null&&temp!=null) {
+                                    tv_weather.setText(weather);
+                                    tv_temp.setText(temp+"℃");
+                                    handler.sendEmptyMessage(1);
+                                }
+
+                            }
+                        });
                     }
-                });
-        if(tv_weather!=null&&temp!=null) {
-            tv_weather.setText(weather);
-            tv_temp.setText(temp + "℃");
-            handler.sendEmptyMessage(1);
-        }
+
+                }).start();
+
+
 
     }
-    private void handleData(String jsonString){
+    private void handleData(InputStream inputStream){
+        BufferedReader br=new BufferedReader(new InputStreamReader(inputStream));
+        String str="";
+        StringBuilder sb=new StringBuilder();
+        try {
+            while ((str=br.readLine())!=null) {
+                sb.append(str);
+            }
+                String content=sb.toString();
+                Log.i("天气",content);
+                JSONObject object = new JSONObject(content);
+                jsonObject1 = object.getJSONObject("result");
+                JSONObject object2 = jsonObject1.getJSONObject("realtime");
+                temp = object2.getString("temperature");
+                weather = object2.getString("info");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+/*    private void handleData(String jsonString){
         try {
             JSONObject object = new JSONObject(jsonString);
-            JSONObject jsonObject1 = object.getJSONObject("result");
+            jsonObject1 = object.getJSONObject("result");
             JSONObject object2 = jsonObject1.getJSONObject("realtime");
             temp = object2.getString("temperature");
             weather = object2.getString("info");
         }catch (Exception e){
             e.printStackTrace();
         }
-    }
+    }*/
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
                 case 1:
-                    if(tv_weather==null) {
+                    if(jsonObject1==null) {
                         Toast.makeText(getActivity(), "天气请求次数已过", Toast.LENGTH_SHORT).show();
                     }
                     break;

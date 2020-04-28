@@ -1,6 +1,7 @@
 package com.example.excelergo.niceexp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -56,6 +57,10 @@ public class LoginActivity extends RegisterActivity {
                     etpsw.setText("");
                 }
                     if (account.equals(name) && psw.equals(pwd)) {
+                        SharedPreferences sp=getSharedPreferences("user",MODE_PRIVATE);
+                        SharedPreferences.Editor editor=sp.edit();
+                        editor.putString("userName",name);
+                        editor.apply();
                         Toast.makeText(getApplicationContext(), "登陆成功", Toast.LENGTH_SHORT).show();
                         Fragment4.tv_user.setText("用户名："+name);
                         finish();

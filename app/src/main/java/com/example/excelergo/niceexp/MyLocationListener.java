@@ -1,5 +1,7 @@
 package com.example.excelergo.niceexp;
 
+import android.util.Log;
+
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 
@@ -15,10 +17,13 @@ public class MyLocationListener extends BDAbstractLocationListener {
         String street = location.getStreet();    //获取街道信息
         String adcode = location.getAdCode();    //获取adcode
         String town = location.getTown();    //获取乡镇信息
-        if(city!=null) {
+        if(city!=null&&addr!=null) {
             MainActivity.tv_location.setText(city);
-            Fragment4.city2=city.substring(0,city.length()-1);
+            //Log.i("位置",Fragment4.city2);
             Fragment4.tv_location4.setText("位置：" + addr);
+            Fragment4.city2=city.substring(0,city.length()-1);
+            MainActivity.locationService.stop();
+            MainActivity.mLocationClient.stop();
         }else {
             MainActivity.locationService.start();
             MainActivity.mLocationClient.start();

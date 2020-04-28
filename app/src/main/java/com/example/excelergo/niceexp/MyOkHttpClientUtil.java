@@ -1,5 +1,8 @@
 package com.example.excelergo.niceexp;
 
+import android.content.Context;
+import android.util.Log;
+
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -11,8 +14,10 @@ import java.io.IOException;
 import utils.OnJsonStringCallBack;
 
 public class MyOkHttpClientUtil  {
+    private static OkHttpClient okHttpClient;
+
     public static void sendRequestForResult(final String jsonUrl, final OnJsonStringCallBack callBack){
-        final OkHttpClient okHttpClient=new OkHttpClient();
+        okHttpClient=new OkHttpClient();
         new Thread(new Runnable() {
             @Override
             public void run() {

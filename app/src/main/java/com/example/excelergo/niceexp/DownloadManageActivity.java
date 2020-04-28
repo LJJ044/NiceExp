@@ -8,19 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
-
 import java.io.File;
 import java.util.List;
-
 import utils.GoBackAction;
-import utils.OnFileDeleteCallBack;
-import utils.OnFileManageCallBack;
-import utils.OnFileSelectedCallBack;
-
 public class DownloadManageActivity extends AppCompatActivity {
 private RecyclerView rv_file;
 private RadioButton goBack_img;
@@ -31,6 +25,7 @@ private MyFileDownloadAdapter fileDownloadAdapter;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download_manage);
+        CheckAppPermissions.geFilePermission(DownloadManageActivity.this);
         rv_file=(RecyclerView)findViewById(R.id.rv_fileName);
         goBack_img=(RadioButton) findViewById(R.id.goBack_download);
         tv_state=(TextView)findViewById(R.id.state_check);
@@ -50,7 +45,7 @@ private MyFileDownloadAdapter fileDownloadAdapter;
                 finish();
             }
         });
-       fileDownloadAdapter.setFileSelectedCallBack(new OnFileSelectedCallBack() {
+        fileDownloadAdapter.setFileSelectedCallBack(new MyFileDownloadAdapter.OnFileSelectedCallBack() {
            @Override
            public void onOpenFile(String fileName) {
                String fileLocation=FileDownloadutil.FilePath+fileName;
@@ -69,7 +64,7 @@ private MyFileDownloadAdapter fileDownloadAdapter;
                startActivity(intent);
            }
        });
-       fileDownloadAdapter.setFileManageCallBack(new OnFileManageCallBack() {
+       fileDownloadAdapter.setFileManageCallBack(new MyFileDownloadAdapter.OnFileManageCallBack() {
            @Override
            public void onOpenFilelocation(String fileLocation) {
                String fileLoaction=FileDownloadutil.FilePath+fileLocation;
@@ -80,10 +75,12 @@ private MyFileDownloadAdapter fileDownloadAdapter;
                }else {
                    uri=FileProvider.getUriForFile(DownloadManageActivity.this,"com.example.excelergo.niceexp.provider",file);
                }
+               String type=FileDownloadutil.getMimeType(file);
                Intent intent=new Intent();
                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION |Intent.FLAG_GRANT_WRITE_URI_PERMISSION );
-               intent.setAction(Intent.ACTION_VIEW);
-               intent.setDataAndType(uri,"file");
+               intent.setAction(Intent.ACTION_GET_CONTENT);
+               intent.addCategory(Intent.CATEGORY_OPENABLE);
+               intent.setDataAndType(uri,type);
                startActivity(intent);
 
            }
@@ -95,4 +92,5 @@ private MyFileDownloadAdapter fileDownloadAdapter;
          }
      });
     }
+
 }

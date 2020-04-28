@@ -24,10 +24,10 @@ private RadioButton goBack;
         setContentView(R.layout.activity_setting);
         rv_setting=(RecyclerView) findViewById(R.id.rv_setting);
         goBack=(RadioButton) findViewById(R.id.img_goBack);
+        adapter=new MySettingRecyclerAdapter();
         LinearLayoutManager manager=new LinearLayoutManager(SettingActivity.this);
         manager.setOrientation(LinearLayout.VERTICAL);
         rv_setting.setLayoutManager(manager);
-        adapter=new MySettingRecyclerAdapter();
         rv_setting.setAdapter(adapter);
         goBack.setOnClickListener(new View.OnClickListener() {
             @Override

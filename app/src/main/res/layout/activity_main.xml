@@ -7,7 +7,6 @@
     tools:context=".MainActivity"
     android:orientation="vertical"
     android:id="@+id/main_layout">
-
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/dl_left"
         android:layout_width="match_parent"
@@ -16,7 +15,15 @@
         android:id="@+id/dl"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
+       <com.example.PullToRefreshView
+           android:id="@+id/pulltorefresh"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent">
+            <com.example.excelergo.niceexp.MyScrollView
+                android:id="@+id/sv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fillViewport="true">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -76,6 +83,8 @@
             </LinearLayout>
 
         </LinearLayout>
+        </com.example.excelergo.niceexp.MyScrollView>
+       </com.example.PullToRefreshView>
         <include layout="@layout/drawer_layout" />
     </android.support.v4.widget.DrawerLayout>
         <include layout="@layout/drawer_layout_bookmark" />

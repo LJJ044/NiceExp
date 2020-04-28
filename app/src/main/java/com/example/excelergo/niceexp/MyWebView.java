@@ -2,10 +2,12 @@ package com.example.excelergo.niceexp;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.webkit.WebView;
+
+import com.tencent.smtt.sdk.WebView;
+
 import utils.OnScrollChangeCallback;
 
-public class MyWebView extends WebView  {
+public class MyWebView extends WebView {
     private OnScrollChangeCallback changeCallback;
     public MyWebView(Context context) {
         super(context);

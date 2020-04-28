@@ -19,7 +19,9 @@ public class MySettingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
     private Context context;
     private View view;
     private GoBackAction goBackAction;
-
+    final static int pageSlide=0;
+    final static int noImge=1;
+    final static int noCache=2;
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -116,7 +118,7 @@ public class MySettingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             sw_switch = itemView.findViewById(R.id.sw_slide);
             SharedPreferences sp = context.getSharedPreferences("switch", Context.MODE_PRIVATE);
             int i = sp.getInt("pageSlide", -1);
-            if (i == 0) {
+            if (i == pageSlide) {
                 sw_switch.setChecked(true);
             }
             sw_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -124,12 +126,12 @@ public class MySettingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (b) {
                             SharedPreferences.Editor editor = getSPDataBase();
-                            editor.putInt("pageSlide", 0);
+                            editor.putInt("pageSlide", pageSlide);
                             editor.apply();
 
                         } else {
                                 SharedPreferences.Editor editor = getSPDataBase();
-                                editor.putInt("pageSlide", 100);
+                                editor.putInt("pageSlide", 10);
                                 editor.apply();
                         }
                 }
@@ -147,7 +149,7 @@ public class MySettingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             sw_img = itemView.findViewById(R.id.sw_noImge);
             SharedPreferences sp=context.getSharedPreferences("switch", Context.MODE_PRIVATE);
             int i=sp.getInt("noImge",-1);
-            if(i==1){
+            if(i==noImge){
                 sw_img.setChecked(true);
             }
             sw_img.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -155,12 +157,12 @@ public class MySettingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (b) {
                         SharedPreferences.Editor editor = getSPDataBase();
-                        editor.putInt("noImge", 1);
+                        editor.putInt("noImge", noImge);
                         editor.apply();
 
                     }else {
                         SharedPreferences.Editor editor = getSPDataBase();
-                        editor.putInt("noImge", 10);
+                        editor.putInt("noImge", 20);
                         editor.apply();
                     }
 
@@ -180,7 +182,7 @@ public class MySettingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
             sw_track = itemView.findViewById(R.id.sw_noTrack);
             SharedPreferences sp=context.getSharedPreferences("switch", Context.MODE_PRIVATE);
             int i=sp.getInt("noCache",-1);
-            if(i==2){
+            if(i==noCache){
                 sw_track.setChecked(true);
             }
             sw_track.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -188,13 +190,12 @@ public class MySettingRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (b) {
                             SharedPreferences.Editor editor = getSPDataBase();
-                            editor.putInt("noCache", 2);
+                            editor.putInt("noCache", noCache);
                             editor.apply();
 
                     }else {
-
                             SharedPreferences.Editor editor = getSPDataBase();
-                            editor.putInt("noCache", 20);
+                            editor.putInt("noCache", 30);
                             editor.apply();
 
                     }
