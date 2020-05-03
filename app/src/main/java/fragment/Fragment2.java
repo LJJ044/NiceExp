@@ -1,11 +1,10 @@
-package com.example.excelergo.niceexp;
-import android.Manifest;
+package fragment;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -13,12 +12,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -32,10 +30,34 @@ import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
-import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
-import com.tencent.smtt.sdk.CookieManager;
+import com.example.PullToRefreshView;
+import com.example.excelergo.niceexp.CheckAppPermissions;
+import com.example.excelergo.niceexp.MyGestureDetectorlistener;
+
+import activity.SearchHistoryActivity;
+import adapter.MyMutiWindowAdapter;
+import adapter.MySettingRecyclerAdapter;
+import adapter.URLSQLiteAdapter;
+import entity.PageHistory;
+import interfaces.GoBackEndCallBack;
+import interfaces.OnProgressChangeCallBack;
+import interfaces.OnScrollChangeCallback;
+import utils.BitmapFileutil;
+import utils.FileDownloadutil;
+import utils.GetFileFromUrlUtil;
+import utils.GetUrlHtmlUtil;
+import utils.ImgeClipUtil;
+import view.MyScrollView;
+import view.MyWebView;
+import com.example.excelergo.niceexp.R;
 import com.tencent.smtt.sdk.CookieSyncManager;
 import com.tencent.smtt.sdk.DownloadListener;
 import com.tencent.smtt.sdk.WebBackForwardList;
@@ -43,21 +65,9 @@ import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebHistoryItem;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
-import com.example.PullToRefreshView;
 import com.tencent.smtt.sdk.WebViewClient;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Objects;
-import utils.GoBackEndCallBack;
-import utils.OnProgressChangeCallBack;
-import utils.OnScrollChangeCallback;
 import static com.example.excelergo.niceexp.MainActivity.bottom_bar;
 import static com.example.excelergo.niceexp.MainActivity.popupmenu;
 import static com.example.excelergo.niceexp.MainActivity.refreshLayout;
@@ -68,24 +78,25 @@ import static com.example.excelergo.niceexp.MainActivity.title_bar;
 public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnClickListener {
     private EditText editText;
     public static MyWebView webView;
+    public static RelativeLayout url_bar;
     private MyScrollView scrollView_f2;
+    private MyMutiWindowAdapter windowAdapter;
     private ProgressBar progressBar;
     private ImageView imageGoback, imageSetting, imageWindow,imageGoforward;
     public static LinearLayout option_button;
     private URLSQLiteAdapter adapter;
     private String originUrl = "https://www.qq.com";
     private ImageView imageView_main_url, img_control;
-    public static RelativeLayout url_bar;
     int lastLocation;
     String lasturl;
-    static private GestureDetector detector;
-    private RelativeLayout out_area, et_area;
+    private GestureDetector detector;
+    private RelativeLayout et_area;
     public static RelativeLayout url_hint;
     int currentMode ;
     public static Handler handler_page;
     public ProgressDialog dialog;
-    int pageSlide,noImge,noCache;
-    public static String css = "javascript: (function() {\n" +
+    public static int pageSlide,noImge,noCache;
+   /* public static String css = "javascript: (function() {\n" +
             "  \n" +
             "    css = document.createElement('link');\n" +
             "    css.id = 'xxx_browser_2014';\n" +
@@ -93,8 +104,8 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
             "    css.href = 'data:text/css,html,body,applet,object,h1,h2,h3,h4,h5,h6,blockquote,pre,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,p,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,th,td{background:rgba(0,0,0,1) !important;color:#000 !important;border-color:#000 !important;scaleable:true;}div,input,button,textarea,select,option,optgroup{background-color:#000 !important;color:#000 !important;border-color:#fff !important;scaleable:true;}a,a *{color:#ffffff !important; text-decoration:none !important;!important;background-color:rgba(0,0,0,1) !important;}a:active,a:hover,a:active *,a:hover *{color:#1F72D0 !important;background-color:rgba(0,0,0,1) !important;}p,span{font color:#FF0000 !important;color:#ffffff !important;background-color:rgba(0,0,0,1) !important;}html{-webkit-filter: contrast(100%)}';\n" +
             "    document.getElementsByTagName('head')[0].appendChild(css);\n" +
             "  \n" +
-            "})();";
-    public static String css2="javascript:var style = document.createElement('style');style.type='text/css';style.id='QQBrowserSDKNightMode';style.innerHTML='html,body{background:none !important;background-color: #1d1e2a !important;}html *{background-color: #1d1e2a !important; color:#888888 !important;border-color:#3e4f61 !important;text-shadow:none !important;box-shadow:none !important;}a,a *{border-color:#4c5b99 !important; color:#F8F8FF !important;text-decoration:none !important;}a:visited,a:visited *{color:#a600a6 !important;}a:active,a:active *{color:#5588AA !important;}input,select,textarea,option,button{background-image:none !important;color:#AAAAAA !important;border-color:#4c5b99 !important;}form,div,button,span{background-color:#1d1e2a !important; border-color:#4c5b99 !important;}img{opacity:0.5}';document.getElementsByTagName('HEAD').item(0).appendChild(style);";
+            "})();";*/
+    public static String css2;
     public Fragment2() {
     }
 
@@ -103,7 +114,6 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment2, container, false);
-        //getCssFile();
         adapter=new URLSQLiteAdapter(getContext());
         currentMode=getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
         initView(view);//初始化控件;
@@ -149,26 +159,6 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
         String[] content = {s, s1};
         return content;
     }
-    public void getCssFile()  {
-        InputStream is=getResources().openRawResource(R.raw.night);
-        byte[] buff =null;
-        try {
-           buff=new byte[is.available()];
-            is.read(buff);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-        css2=new String(buff);
-        Log.i("css样式文件",css2);
-
-    }
 //获取浏览网址记录并存储到数据库
     private void myLastUrl() {
         BitmapFileutil.createDir();//创建文件夹
@@ -196,7 +186,8 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
     }
     private void initView(View view) {
         //scrollView_f2=view.findViewById(R.id.sv_f2);
-        webView = view.findViewById(R.id.wv_music);
+        url_bar=view.findViewById(R.id.url_bar);
+        webView=view.findViewById(R.id.wv_music);
         editText = view.findViewById(R.id.et_url);
         progressBar = view.findViewById(R.id.pbar);
         imageGoback = view.findViewById(R.id.iv_option_left);
@@ -206,14 +197,11 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
         option_button = view.findViewById(R.id.bottombar);
         imageView_main_url = view.findViewById(R.id.url_main_title);
         img_control = view.findViewById(R.id.control_webview);
-        url_bar = view.findViewById(R.id.url_bar);
-        out_area = view.findViewById(R.id.out_area);
         et_area = view.findViewById(R.id.et_area);
         url_hint=view.findViewById(R.id.url_hint);
         webView.addJavascriptInterface(new InJavaScriptLocalObject(), "java_obj");
-        editText.requestFocus();
         option_button.setVisibility(View.GONE);
-
+        editText.requestFocus();
     }
     private void initListener(){
         webView.setOnTouchListener(this);//给WebView绑定触摸监听
@@ -223,7 +211,6 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
         imageWindow.setOnClickListener(this);
         et_area.setOnClickListener(this);
         url_bar.setOnClickListener(this);
-        out_area.setOnClickListener(this);
         editText.setOnClickListener(this);
 
     }
@@ -244,10 +231,10 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setBlockNetworkImage(false);
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setAllowFileAccess(true);
-        webSettings.setLoadsImagesAutomatically(true);
         webSettings.setDomStorageEnabled(true); // 开启 DOM storage API 功能
         webSettings.setDatabaseEnabled(true);   //开启 database storage API 功能
         webSettings.setAppCacheEnabled(true);
@@ -339,13 +326,14 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
         img_control.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                webView.scrollTo(0, 0);
+              webView.scrollTo(0,0);
+              Log.i("滑动","有用");
             }
         });
         //设置根据WebView的滑动底部选项栏的动作
         webView.setChangeCallback(new OnScrollChangeCallback() {
             @Override
-            public void onScroll(int dx, int dy, int dx_change, int dy_change) {
+            public void onScroll(int dx, final int dy, int dx_change, int dy_change) {
                 Log.i("滚动", String.valueOf(dy));
                 refreshLayout.setEnabled(false);
                 if (dy == 0) {
@@ -365,15 +353,10 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
                 }
                 if(!webView.canScrollVertically(View.SCROLL_AXIS_VERTICAL)){
                     refreshLayout.setEnabled(false);
-                    if(currentMode==Configuration.UI_MODE_NIGHT_YES){
-                        webView.setBackgroundColor(getResources().getColor(R.color.pure_black));
-                    }
                 }
-                if (dy_change > 50) {
-                    lastLocation=dy;
-                    lasturl=getCurrentUrl()[0];
-                    inserthistory();
-                    if (img_control.getVisibility() == View.VISIBLE) {
+                if (dy_change > 80) {
+                        inserthistory(dy);
+                        if (img_control.getVisibility() == View.VISIBLE) {
                         //控制按钮
                         img_control.startAnimation(arrowShowOffAnimation());
                         TranslateAnimation translateAnimation2 = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 1.0f);
@@ -388,13 +371,13 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
                         set.addAnimation(urlAnoimation);
                         set.addAnimation(urlAlpha);
                         //顶部网址栏
-                        url_bar.startAnimation(set);
+                        //url_bar.startAnimation(set);
 
                     }
                     url_bar.setVisibility(View.GONE);
                     option_button.setVisibility(View.GONE);
                     img_control.setVisibility(View.GONE);
-                } else if (dy_change < -50) {
+                } else if (dy_change < -80) {
                     if (img_control.getVisibility() == View.GONE) {
                         TranslateAnimation translateAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f);
                         translateAnimation.setDuration(1000);
@@ -459,7 +442,7 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
                 }else {
                     imageGoforward.setImageResource(R.drawable.backspace3);
                 }
-
+                myLastUrl();
             }
 
         });
@@ -470,10 +453,10 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
                 super.onProgressChanged(view, newProgress);
                 progressBar.setMax(100);
                 progressBar.setProgress(newProgress);
-                progressBar.setVisibility(newProgress==100?View.INVISIBLE:View.VISIBLE);
-                    editText.setText(getCurrentUrl()[1]);
-                    myLastUrl();
-                    insertSearchHistory();
+                progressBar.setVisibility(newProgress==100?View.GONE:View.VISIBLE);
+                editText.setText(getCurrentUrl()[1]);
+                insertSearchHistory();
+
                     Bitmap bitmap = ImgeClipUtil.getLocalBitmap(BitmapFileutil.ImgPath+ webView.getTitle() + ".jpg");//加载从网络存储到本地的图标
                     if (bitmap != null) {
                         imageView_main_url.setImageBitmap(ImgeClipUtil.ClipSquareBitmap(bitmap, 200, bitmap.getWidth()));//对图标进行裁切处理
@@ -571,7 +554,9 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
 
     }
     //当前网页浏览记录插入SharedPreferences
-    private void inserthistory() {
+    private void inserthistory(int location) {
+        lastLocation=location;
+        lasturl=getCurrentUrl()[0];
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("locationdata", Context.MODE_PRIVATE);
         if(sharedPreferences!=null) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -606,9 +591,9 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
             Log.i("手势", String.valueOf(xAxis));
             if(pageSlide==0) {
                 if (Math.abs(yAxis) <= 100) {
-                    if (xAxis > 400 && webView.canGoBack() && Math.abs(v) > 300) {
+                    if (xAxis > 300 && webView.canGoBack() && Math.abs(v) > 300) {
                         webView.goBack();
-                    } else if (xAxis < -400 && webView.canGoForward() && Math.abs(v) > 300) {
+                    } else if (xAxis < -300 && webView.canGoForward() && Math.abs(v) > 300) {
                         webView.goForward();
                     }
                 }
@@ -628,11 +613,9 @@ public class Fragment2 extends Fragment implements View.OnTouchListener,View.OnC
                 }
                 break;
             case R.id.et_url:
-                Intent intent=new Intent(getActivity(),SearchHistoryActivity.class);
-                  intent.putExtra("url",editText.getText().toString());
-                  startActivity(intent);
+                Intent intent2=new Intent(getActivity(), SearchHistoryActivity.class);
+                startActivity(intent2);
                 break;
-
             case R.id.iv_option_right:
                 webView.loadUrl(originUrl);
                 break;

@@ -1,4 +1,4 @@
-package com.example.excelergo.niceexp;
+package fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,21 +12,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.example.PullToRefreshView;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.example.excelergo.niceexp.MainActivity;
+
+import activity.NewsActivity;
+import adapter.JsonNewsSQliteAdapter;
+import entity.NewsBean;
+import interfaces.OnJsonStringCallBack;
+import interfaces.OnScrollChangeCallback;
+import utils.MyOkHttpClientUtil;
+import view.MyScrollView;
+import com.example.excelergo.niceexp.R;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import utils.OnJsonStringCallBack;
-import utils.OnScrollChangeCallback;
 
 import static com.example.excelergo.niceexp.MainActivity.refreshLayout;
 
@@ -70,7 +79,7 @@ public class NewsFragment9 extends Fragment {
                 },1000);
             }
         });
-        myScrollView.setOnTouchListener(new View.OnTouchListener() {
+        recyclerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if(motionEvent.getAction()==MotionEvent.ACTION_DOWN){
@@ -116,12 +125,18 @@ public class NewsFragment9 extends Fragment {
                     JSONArray jsonArray = jsonObjectResult.getJSONArray("data");
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-                        String title = jsonObject1.getString("title");
-                        String picture = jsonObject1.getString("thumbnail_pic_s");
-                        String url = jsonObject1.getString("url");
+                        final String title = jsonObject1.getString("title");
+                        final String picture = jsonObject1.getString("thumbnail_pic_s");
+                        final String url = jsonObject1.getString("url");
                         if(jsonObjectResult!=null) {
                             newsBeanList.add(new NewsBean(title, picture, url));
-                            newsSQliteAdapter.insetNewsItem("news_caijing",new NewsBean(title, picture, url));
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    newsSQliteAdapter.deleteAll("news_caijing");
+                                    newsSQliteAdapter.insetNewsItem("news_caijing",new NewsBean(title, picture, url));
+                                }
+                            }).start();
                         }
                     }
                 } catch (JSONException e) {
@@ -143,13 +158,22 @@ public class NewsFragment9 extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, final int i) {
-            Glide.with(getContext()).load(newsBeanList.get(i).getImg()).into(myViewHolder.imageView);
+        public void onBindViewHolder(@NonNull final MyViewHolder myViewHolder, final int i) {
+            Glide
+                    .with(getContext())
+                    .load(newsBeanList.get(i).getImg())
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .into(new SimpleTarget<GlideDrawable>() {
+                        @Override
+                        public void onResourceReady(GlideDrawable glideDrawable, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                            myViewHolder.imageView.setImageDrawable(glideDrawable);
+                        }
+                    });
             myViewHolder.textView.setText(newsBeanList.get(i).getTitle());
             myViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent=new Intent(getActivity(),NewsActivity.class);
+                    Intent intent=new Intent(getActivity(), NewsActivity.class);
                     intent.putExtra("url",newsBeanList.get(i).getUrl());
                     startActivity(intent);
                     getActivity().overridePendingTransition(R.anim.switchanimation,R.anim.switchanimation1);
@@ -160,7 +184,13 @@ public class NewsFragment9 extends Fragment {
         @Override
         public int getItemCount() {
             if(jsonObjectResult==null){
-                newsBeanList=newsSQliteAdapter.queryAllNews("news_caijing");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        newsBeanList=newsSQliteAdapter.queryAllNews("news_caijing");
+                    }
+                }).start();
+
             }
             return newsBeanList.size();
         }

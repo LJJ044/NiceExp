@@ -1,12 +1,14 @@
-package com.example.excelergo.niceexp;
+package activity;
+
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
+import com.example.excelergo.niceexp.R;
 import com.example.searchview.ICallBack;
 import com.example.searchview.SearchView;
 import com.example.searchview.bCallBack;
 
-import static com.example.excelergo.niceexp.Fragment2.webView;
-
+import static fragment.Fragment2.webView;
 
 public class SearchHistoryActivity extends AppCompatActivity {
     private SearchView searchView;
