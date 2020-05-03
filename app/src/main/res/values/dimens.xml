@@ -4,4 +4,5 @@
     <dimen name="ToolBarTextPadiing">15dp</dimen>
     <dimen name="ToolBarMainTextSize">20sp</dimen>
     <dimen name="text_size_16">16sp</dimen>
+    <dimen name="view_pager">200dp</dimen>
 </resources>

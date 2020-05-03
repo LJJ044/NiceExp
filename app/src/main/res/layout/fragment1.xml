@@ -3,12 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment1">
+    tools:context="fragment.Fragment1">
 
-<com.example.excelergo.niceexp.MyWebView
+<view.MyWebView
     android:id="@+id/wv_f1"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-</com.example.excelergo.niceexp.MyWebView>
+</view.MyWebView>
     </FrameLayout>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".NewsActivity"
+    tools:context="activity.NewsActivity"
     android:orientation="vertical">
 <RelativeLayout
     android:id="@+id/title_bar_news"
@@ -21,9 +21,9 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="10dp"/>
 </RelativeLayout>
-    <com.example.excelergo.niceexp.MyWebView
+    <view.MyWebView
         android:id="@+id/wv"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </com.example.excelergo.niceexp.MyWebView>
+    </view.MyWebView>
 </LinearLayout>

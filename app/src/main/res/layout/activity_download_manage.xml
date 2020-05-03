@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DownloadManageActivity"
+    tools:context="activity.DownloadManageActivity"
     android:orientation="vertical">
     <LinearLayout
         android:id="@+id/top_manage"
@@ -35,12 +35,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/title_bar_manage">
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_fileName"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/drawer_background"
-            android:padding="20dp">
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="20dp">
 
         </android.support.v7.widget.RecyclerView>
 

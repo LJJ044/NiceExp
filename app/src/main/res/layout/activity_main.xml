@@ -14,12 +14,13 @@
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/dl"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
        <com.example.PullToRefreshView
            android:id="@+id/pulltorefresh"
            android:layout_width="match_parent"
            android:layout_height="match_parent">
-            <com.example.excelergo.niceexp.MyScrollView
+            <view.MyScrollView
                 android:id="@+id/sv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -27,15 +28,17 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            >
         <include layout="@layout/toolbar_main"/>
 
-            <com.example.excelergo.niceexp.MyViewPager
-                android:id="@+id/vp"
+
+            <view.MyViewPager
+                android:id="@+id/vp_main"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_gravity="center"
                 android:layout_weight="1"/>
-
 
             <LinearLayout
                 android:id="@+id/bottom_bar"
@@ -83,7 +86,7 @@
             </LinearLayout>
 
         </LinearLayout>
-        </com.example.excelergo.niceexp.MyScrollView>
+        </view.MyScrollView>
        </com.example.PullToRefreshView>
         <include layout="@layout/drawer_layout" />
     </android.support.v4.widget.DrawerLayout>

@@ -3,7 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment4">
+    tools:context="fragment.Fragment4">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <RelativeLayout
         android:id="@+id/main_page"
         android:layout_width="match_parent"
@@ -124,6 +127,7 @@
         </RelativeLayout>
     </RelativeLayout>
     </RelativeLayout>
+    </LinearLayout>
     <include layout="@layout/chooseimg_layout"
         android:id="@+id/popup_choose"
         android:visibility="gone"/>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingActivity"
+    tools:context="activity.SettingActivity"
     android:orientation="vertical">
     <LinearLayout
         android:id="@+id/top_setting"
@@ -40,6 +40,7 @@
         android:layout_height="match_parent"
         android:background="@color/drawer_background"
         android:paddingStart="20dp"
+        android:paddingEnd="20dp"
         android:layout_below="@id/title_bar_setting"/>
 
 

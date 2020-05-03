@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".SearchHistoryActivity">
+    tools:context="activity.SearchHistoryActivity">
 <com.example.searchview.SearchView
         android:id="@+id/search_view"
         android:layout_width="match_parent"

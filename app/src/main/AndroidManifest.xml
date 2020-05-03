@@ -49,34 +49,25 @@
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="tXUW04xDnLHNMBEtFcAK4Lmhqc8Lch5h" />
-
-        <activity android:name=".GuideActivity">
+        <activity android:name="activity.GuideActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" android:windowSoftInputMode="adjustUnspecified|stateAlwaysHidden">
-
-        </activity>
-        <activity android:name=".NewsActivity" />
-        <activity android:name=".HistoryActivity" />
-        <activity android:name=".SkinsActivity" />
-        <activity
-            android:name=".SearchHistoryActivity"
-            android:theme="@style/AppTheme" />
-        <activity
-            android:name=".LoginActivity"
-            android:theme="@style/StatusWhite" />
-        <activity
-            android:name=".RegisterActivity"
-            android:theme="@style/StatusWhite" />
-        <activity
-            android:name=".AlterActivity"
-            android:theme="@style/StatusWhite" />
-        <activity android:name=".SettingActivity" />
-        <activity android:name=".DownloadManageActivity"/>
+        <activity android:name=".MainActivity"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"/>
+        <activity android:name="activity.RegisterActivity"/>
+        <activity android:name="activity.LoginActivity"/>
+        <activity android:name="activity.AlterActivity"/>
+        <activity android:name="activity.SkinsActivity"/>
+        <activity android:name="activity.HistoryActivity"/>
+        <activity android:name="activity.NewsActivity"/>
+        <activity android:name="activity.SearchHistoryActivity"
+            android:theme="@style/AppTheme"/>
+        <activity android:name="activity.DownloadManageActivity"/>
+        <activity android:name="activity.SettingActivity"/>
     </application>
 
 </manifest>

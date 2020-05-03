@@ -4,24 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".DownloadManageActivity"
+    tools:context="activity.DownloadManageActivity"
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="5dp">
-<TextView
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:gravity="center">
+    <ImageView
+        android:id="@+id/fileIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/mp3"/>
+    <TextView
     android:id="@+id/fileName"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:text="文件名"
-    android:textSize="12sp" />
+    android:textSize="14sp"
+        android:layout_marginStart="10dp"/>
     </LinearLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/tvSelected"
-        android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom"
+        android:paddingStart="-10dp"
+        android:paddingEnd="-10dp"/>
 
 </FrameLayout>

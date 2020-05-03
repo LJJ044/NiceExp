@@ -8,24 +8,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.PermissionChecker;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -33,13 +29,11 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
-import android.webkit.WebSettings;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -47,11 +41,12 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.bumptech.glide.Glide;
 import com.example.PullToRefreshView;
 import com.mylhyl.acp.Acp;
 import com.mylhyl.acp.AcpListener;
@@ -65,13 +60,26 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import utils.OnScrollChangeCallback;
-
-import static com.example.excelergo.niceexp.Fragment1.Webview2;
-import static com.example.excelergo.niceexp.Fragment2.option_button;
-import static com.example.excelergo.niceexp.Fragment2.url_bar;
-import static com.example.excelergo.niceexp.Fragment2.url_hint;
-import static com.example.excelergo.niceexp.Fragment2.webView;
+import activity.HistoryActivity;
+import activity.SettingActivity;
+import activity.SkinsActivity;
+import adapter.MyDrawerAdapter;
+import adapter.MyDrawerAdapterLeft;
+import adapter.MyFragmentViewPagerAdapter;
+import adapter.MySettingRecyclerAdapter;
+import adapter.SkinChangeAdapter;
+import adapter.URLFAVSQLiteAdapter;
+import entity.PageHistory;
+import fragment.Fragment2;
+import utils.BitmapFileutil;
+import view.GridSpacingItemDecoration;
+import view.MyScrollView;
+import view.MyViewPager;
+import static fragment.Fragment1.Webview2;
+import static fragment.Fragment2.option_button;
+import static fragment.Fragment2.url_bar;
+import static fragment.Fragment2.url_hint;
+import static fragment.Fragment2.webView;
 
 public class MainActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener,ViewPager.OnPageChangeListener,View.OnClickListener {
     private MyFragmentViewPagerAdapter myFragmentViewPagerAdapter;
@@ -110,7 +118,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.CAMERA
+                Manifest.permission.CAMERA,
+                Manifest.permission.READ_PHONE_STATE
         ).build(), new AcpListener() {
             @Override
             public void onGranted() {
@@ -126,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
             }
         });
         onCreate();
-        //getCssFile();
+        getCssFile();
         createFileDir();//创建应用主文件夹
         locationService=((NiceExpApplication)getApplication()).locationService;
         locationService.registerListener(myListener);
@@ -153,8 +162,15 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         recyclerView.addItemDecoration(new GridSpacingItemDecoration(5, 10, true));
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(popupMenuAdapter);
-
         initSetAdapter();
+     /*   DisplayMetrics dm=new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int screenWidth=dm.widthPixels;
+        int screenHeight=dm.heightPixels;
+        LinearLayout.LayoutParams params=(LinearLayout.LayoutParams)viewPager.getLayoutParams();
+        params.height=screenHeight/2;
+        params.width=screenWidth/2;
+        viewPager.setLayoutParams(params);*/
         ScaleAnimation scaleAnimation=new ScaleAnimation(0.0f,1.0f,0.0f,1.0f,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
         scaleAnimation.setDuration(500);
         viewPager.startAnimation(scaleAnimation);
@@ -230,11 +246,13 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         }
     }
     private void getCssFile(){
+        String content="";
         InputStream is=getResources().openRawResource(R.raw.night);
         byte[] buff = new byte[0];
         try {
             buff=new byte[is.available()];
             is.read(buff);
+            content=new String(buff);
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
@@ -244,7 +262,9 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                 e.printStackTrace();
             }
         }
-        //css2=Base64.encodeToString(buff,Base64.NO_WRAP);
+//        Base64.encodeToString(buff,Base64.NO_WRAP);
+        Fragment2.css2=content;
+        Log.i("css样式文件", Fragment2.css2);
     }
     private void initSetAdapter(){
         recyclerView.setAdapter(popupMenuAdapter);
@@ -263,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         scrollView=(MyScrollView) findViewById(R.id.sv);
         refreshLayout=(PullToRefreshView) findViewById(R.id.pulltorefresh);
         radioGroup=(RadioGroup) findViewById(R.id.rg);
-        viewPager=(MyViewPager) findViewById(R.id.vp);
+        viewPager=(MyViewPager) findViewById(R.id.vp_main);
         btn1=(RadioButton) findViewById(R.id.btn_1);
         btn2=(RadioButton)findViewById(R.id.btn_2);
         btn3=(RadioButton)findViewById(R.id.btn_3);
@@ -466,12 +486,11 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                             Toast.makeText(MainActivity.this,"该网站已收藏",Toast.LENGTH_SHORT).show();
                             break;
                         case 2:popupmenu.setVisibility(View.GONE);
-                            startActivity(new Intent(MainActivity.this,SkinsActivity.class));
+                            startActivity(new Intent(MainActivity.this, SkinsActivity.class));
                             break;
                         case 3:
                             popupmenu.setVisibility(View.GONE);
-                            startActivity(new Intent(MainActivity.this,SettingActivity.class));
-                            finish();
+                            startActivity(new Intent(MainActivity.this, SettingActivity.class));
                             break;
                         case 4:
                             //夜间模式实现
@@ -534,6 +553,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
                             webView.clearCache(true);
                             webView.clearHistory();
                             webView.clearFormData();
+                            Glide.clear(webView);
                             BitmapFileutil.deletFiles();
                             Toast.makeText(MainActivity.this,"缓存已清空",Toast.LENGTH_SHORT).show();
                             break;

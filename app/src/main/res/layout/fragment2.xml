@@ -4,127 +4,75 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment2">
+    tools:context="fragment.Fragment2">
 
-        <ImageView
-            android:id="@+id/control_webview"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_alignParentEnd="true"
-            android:layout_gravity="bottom"
-            android:layout_marginLeft="310dp"
-            android:layout_marginRight="-20dp"
-            android:layout_marginBottom="75dp"
-            android:src="@drawable/arrow" />
+    <LinearLayout
+        android:id="@+id/out_area"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <RelativeLayout
-            android:id="@+id/out_area"
+            android:id="@+id/url_bar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-                android:id="@+id/bottombar"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_alignParentBottom="true"
-                android:background="#f9f7f7"
-                android:orientation="horizontal">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:id="@+id/iv_option_right"
-                        style="@style/option_button"
-                        android:layout_alignTop="@id/iv_option_center"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="10dp"
-                        android:background="@drawable/main_page" />
-
-                    <ImageView
-                        android:id="@+id/iv_option_center"
-                        style="@style/option_button"
-                        android:layout_centerInParent="true"
-                        android:background="@drawable/options" />
-
-                    <ImageView
-                        android:id="@+id/iv_option_left"
-                        style="@style/option_button"
-                        android:layout_alignTop="@id/iv_option_center"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="10dp"
-                        android:src="@drawable/backspace4" />
-
-                    <ImageView
-                        android:id="@+id/iv_option_left2"
-                        style="@style/option_button"
-                        android:layout_alignTop="@id/iv_option_center"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="100dp"
-                        android:src="@drawable/backspace3" />
-
-                </RelativeLayout>
-
-            </LinearLayout>
-
-            <ProgressBar
-                android:id="@+id/pbar"
-                style="@android:style/Widget.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_below="@id/url_bar" />
+            android:layout_height="40dp"
+            android:background="@drawable/shape">
 
             <RelativeLayout
-                android:id="@+id/url_bar"
+                android:id="@+id/et_area"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:background="@drawable/shape">
+                android:paddingStart="20dp">
 
-                <RelativeLayout
-                    android:id="@+id/et_area"
+                <EditText
+                    android:id="@+id/et_url"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:paddingStart="20dp">
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@id/url_main_title"
+                    android:backgroundTint="@color/transparent"
+                    android:ems="20"
+                    android:singleLine="true"
+                    android:textColor="#6c6161"
+                    android:textSize="15sp" />
 
-                    <EditText
-                        android:id="@+id/et_url"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_toEndOf="@id/url_main_title"
-                        android:backgroundTint="@color/transparent"
-                        android:ems="20"
-                        android:singleLine="true"
-                        android:textColor="#6c6161"
-                        android:textSize="15sp" />
-
-                    <ImageView
-                        android:id="@+id/url_main_title"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_marginTop="8dp" />/>
-
-                </RelativeLayout>
-
+                <ImageView
+                    android:id="@+id/url_main_title"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginTop="8dp" />/>
 
             </RelativeLayout>
 
 
-            <com.example.excelergo.niceexp.MyWebView
-                android:id="@+id/wv_music"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_above="@id/bottombar"
-                android:layout_below="@id/url_bar" />
-
         </RelativeLayout>
+        <ProgressBar
+            android:id="@+id/pbar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_below="@id/url_bar" />
 
+        <view.MyWebView
+            android:id="@+id/wv_music"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/control_webview"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="bottom"
+        android:layout_marginLeft="310dp"
+        android:layout_marginRight="-20dp"
+        android:layout_marginBottom="75dp"
+        android:src="@drawable/arrow" />
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom">
-
             <include
                 android:id="@+id/url_hint"
                 layout="@layout/url_hint"
@@ -135,5 +83,52 @@
                 android:visibility="visible" />
 
         </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/bottombar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:background="#f9f7f7"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iv_option_right"
+                style="@style/option_button"
+                android:layout_alignTop="@id/iv_option_center"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/main_page" />
+
+            <ImageView
+                android:id="@+id/iv_option_center"
+                style="@style/option_button"
+                android:layout_centerInParent="true"
+                android:background="@drawable/options" />
+
+            <ImageView
+                android:id="@+id/iv_option_left"
+                style="@style/option_button"
+                android:layout_alignTop="@id/iv_option_center"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/backspace4" />
+
+            <ImageView
+                android:id="@+id/iv_option_left2"
+                style="@style/option_button"
+                android:layout_alignTop="@id/iv_option_center"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="100dp"
+                android:src="@drawable/backspace3" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
 </FrameLayout>
